@@ -6,7 +6,7 @@ A standalone Function Point / WBS estimator, served as a single Go binary. One g
 
 ```bash
 go build -o fp-estimator .
-FP_APP=ai-agents-provly ./fp-estimator      # or FP_APP=tripma
+FP_APP=tripma ./fp-estimator                # or any folder under data/
 open http://localhost:8080
 ```
 
@@ -50,15 +50,15 @@ ai-dlc-fp-estimation/
 ├── app/
 │   └── index.html        # the entire front end — one generic engine, no per-project branding baked in
 └── data/
-    ├── ai-agents-provly/  # Provly's WBS dataset
-    │   ├── metadata.json  # project summary, FP weights, GSC defaults, status labels, product list
+    ├── schema/             # JSON Schema for dataset authoring (IDE validation, not runtime-enforced)
+    ├── tripma/             # demo dataset — the default (FP_APP=tripma)
+    │   ├── metadata.json   # project summary, FP weights, GSC defaults, status labels, product list
     │   ├── tech-stack.json
-    │   └── p1-*.json ... p7-*.json
-    └── tripma/             # demo dataset for testing the multi-app partitioning
-        ├── metadata.json
-        ├── tech-stack.json
-        └── p1-*.json ... p4-*.json
+    │   └── p1-*.json ... p4-*.json
+    └── qa-malformed-fixture/  # deliberately malformed fields; regression fixture for renderers
 ```
+
+Datasets are discovered from the `data/` directory listing, so a partition can be added or kept private without any code change. `data/ai-agents-provly/` is one such private dataset — it's gitignored, so it won't be present in a fresh clone; if you have it locally, run it with `FP_APP=ai-agents-provly`.
 
 The app layer reads everything it needs — title, branding, status labels, FP weights, GSC config, products — from whichever dataset the server hands it at `/api/data`. There is nothing in `app/index.html` that assumes a specific project.
 
@@ -75,7 +75,7 @@ See `.claude/skills/add-fp-dataset/SKILL.md` for the step-by-step checklist. The
 | Env var | Flag | Default | Purpose |
 |---|---|---|---|
 | `FP_PORT` | `--port` | `8080` | Listen port |
-| `FP_APP` | `--app` | `ai-agents-provly` | Which `data/<name>/` partition to serve by default |
+| `FP_APP` | `--app` | `tripma` | Which `data/<name>/` partition to serve by default |
 | `FP_DEV` | `--dev` | `false` | Serve `app/` and `data/` live from disk instead of the embedded copies — no rebuild needed to see edits |
 | `FP_LOG_LEVEL` | `--log-level` | `info` | Log verbosity |
 | `FP_LOG_FORMAT` | `--log-format` | `text` | `text` or `json` |

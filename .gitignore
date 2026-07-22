@@ -4,3 +4,7 @@ fp-estimator-darwin-arm64
 .env
 .DS_Store
 *.log
+
+# Proprietary dataset — kept local, not published.
+# tripma (demo) and qa-malformed-fixture (test) stay tracked.
+data/ai-agents-provly/

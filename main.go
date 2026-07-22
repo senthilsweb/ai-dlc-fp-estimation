@@ -22,7 +22,7 @@ var dataFS embed.FS
 
 func main() {
 	port := flag.String("port", getEnv("FP_PORT", "8080"), "Listen port")
-	appName := flag.String("app", getEnv("FP_APP", "ai-agents-provly"), "Default dataset (data/<name>/) to serve at startup")
+	appName := flag.String("app", getEnv("FP_APP", "tripma"), "Default dataset (data/<name>/) to serve at startup")
 	logLevel := flag.String("log-level", getEnv("FP_LOG_LEVEL", "info"), "Log level (debug, info, warn, error)")
 	logFormat := flag.String("log-format", getEnv("FP_LOG_FORMAT", "text"), "Log format (text, json)")
 	devMode := flag.Bool("dev", getEnv("FP_DEV", "false") == "true", "Serve app/ and data/ live from disk instead of the embedded copies — no rebuild needed to see edits (run from the repo root)")

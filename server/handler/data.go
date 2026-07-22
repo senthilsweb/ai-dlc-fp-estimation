@@ -29,7 +29,10 @@ func DataHandler(dataFS fs.FS, defaultApp string) gin.HandlerFunc {
 }
 
 // AppsHandler lists the dataset folder names available under data/, so
-// callers can discover what's available to pass as ?app=.
+// callers can discover what's available to pass as ?app=. A directory only
+// counts as a dataset if it actually holds a metadata.json — that keeps
+// support folders (e.g. data/schema/, which holds JSON Schema files) from
+// being offered as selectable datasets that would 404 on /api/data.
 func AppsHandler(dataFS fs.FS) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		entries, err := fs.ReadDir(dataFS, ".")
@@ -39,9 +42,13 @@ func AppsHandler(dataFS fs.FS) gin.HandlerFunc {
 		}
 		apps := []string{}
 		for _, e := range entries {
-			if e.IsDir() {
-				apps = append(apps, e.Name())
+			if !e.IsDir() {
+				continue
 			}
+			if _, err := fs.Stat(dataFS, e.Name()+"/metadata.json"); err != nil {
+				continue
+			}
+			apps = append(apps, e.Name())
 		}
 		c.JSON(http.StatusOK, gin.H{"apps": apps})
 	}

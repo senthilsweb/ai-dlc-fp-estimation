@@ -7,7 +7,7 @@ services:
       - "${FP_PORT:-8080}:${FP_PORT:-8080}"
     environment:
       FP_PORT: "${FP_PORT:-8080}"
-      FP_APP: "${FP_APP:-ai-agents-provly}"
+      FP_APP: "${FP_APP:-tripma}"
       FP_LOG_LEVEL: "${FP_LOG_LEVEL:-info}"
       FP_LOG_FORMAT: json
     healthcheck:

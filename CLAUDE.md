@@ -29,7 +29,7 @@ A single Go binary that serves a generic Function Point / WBS estimator SPA (`ap
 
 ```bash
 go build -o fp-estimator .        # or: make build — Go is required for this step, once
-FP_APP=ai-agents-provly ./fp-estimator   # or: FP_APP=tripma ./fp-estimator; or go run . --app <name>
+FP_APP=tripma ./fp-estimator             # or any folder under data/; or go run . --app <name>
 FP_PORT=8081 ./fp-estimator              # pick a port if the default is taken (also: make run PORT=8081 APP=tripma)
 make build-linux / make build-darwin     # cross-compile
 make docker                              # build the Docker image

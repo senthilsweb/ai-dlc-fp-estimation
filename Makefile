@@ -3,7 +3,7 @@ GO_MODULE := github.com/senthilsweb/ai-dlc-fp-estimation
 
 # Override on the command line, e.g. `make run PORT=8081 APP=tripma`
 PORT ?= 8080
-APP ?= ai-agents-provly
+APP ?= tripma
 
 .PHONY: build build-linux build-darwin run dev clean docker help
 
