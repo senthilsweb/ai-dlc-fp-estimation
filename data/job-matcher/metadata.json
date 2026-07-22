@@ -1,0 +1,429 @@
+{
+  "$schema": "../schema/metadata.schema.json",
+  "version": "0.9.0",
+  "createdDate": "2026-07-22",
+  "description": "AI-DLC worked example: agent-job-matcher, derived from its OpenSpec markdown (openspec/changes/<name>/ = Intent, \"## Bolt N\" = Bolt, \"- [x]\" = Unit of Work). IMPORTANT: the source contains NO estimation data of any kind \u2014 no story points, hours or complexity ratings. FP type/complexity here were inferred by keyword heuristic as a FIRST PASS FOR HUMAN REVIEW, not measured. Treat the totals as illustrative of the tool, not as an estimate of this project.",
+  "projectSummary": {
+    "logo": "mdi:briefcase-search-outline",
+    "logoColor": "#8b5cf6",
+    "name": "agent-job-matcher",
+    "tagline": "Resume-to-posting matching, built end-to-end with AI-DLC",
+    "description": "A job-matching agent (resume parsing, posting fetch, LLM scoring, cover-letter generation) delivered following the full AI-DLC method: 7 Intents, 31 Bolts, 190 Units of Work, with evals pinned before or alongside the code they gate. Used here as a structural reference for what an AI-native delivery breakdown looks like in practice.",
+    "techStack": [
+      "Python 3.11",
+      "pydantic-ai",
+      "FastAPI",
+      "Typer",
+      "Next.js",
+      "TypeScript",
+      "MCP",
+      "OpenTelemetry",
+      "Docker"
+    ],
+    "businessContext": {
+      "industry": "AI Agents / Developer Tooling",
+      "targetUsers": [
+        "Job seekers",
+        "Recruiters",
+        "Forward-deployed AI engineers",
+        "AI-DLC practitioners"
+      ],
+      "valuePropositions": [
+        "Worked example of an AI-DLC delivery breakdown, end to end",
+        "Bolts sized as deployable increments rather than time-boxed sprints",
+        "Evals specified before the code they gate, as first-class units of work",
+        "Structure derived from real OpenSpec artifacts, not invented for a demo"
+      ]
+    },
+    "keyJourneys": [
+      {
+        "name": "Inception",
+        "icon": "mdi:lightbulb-outline",
+        "steps": [
+          "Intent Capture",
+          "Mob Elaboration",
+          "Inception Gate"
+        ]
+      },
+      {
+        "name": "Construction",
+        "icon": "mdi:hammer-wrench",
+        "steps": [
+          "Mob Construction",
+          "Evals + Rubrics",
+          "Security Baseline",
+          "Verification"
+        ]
+      },
+      {
+        "name": "Operations",
+        "icon": "mdi:chart-line",
+        "steps": [
+          "Operations Review",
+          "Next Intent"
+        ]
+      }
+    ]
+  },
+  "projectConfig": {
+    "title": "agent-job-matcher \u2014 AI-DLC Work Breakdown",
+    "mainProductName": "agent-job-matcher",
+    "brandPrefix": "JOB-MATCHER",
+    "organization": "\u2014",
+    "defaultHourlyRate": 75,
+    "defaultPDR": 8,
+    "currency": "USD",
+    "hoursPerDay": 8,
+    "daysPerMonth": 20,
+    "levels": {
+      "1": {
+        "singular": "Intent",
+        "plural": "Intents"
+      },
+      "2": {
+        "singular": "Bolt",
+        "plural": "Bolts"
+      },
+      "3": {
+        "singular": "Unit of Work",
+        "plural": "Units of Work"
+      }
+    },
+    "products": [
+      {
+        "shortCode": "ADD-DEMO-STACK",
+        "description": "AI-DLC Intent: add-demo-stack-and-playground",
+        "dataFile": "i1-add-demo-stack-and-playground.json"
+      },
+      {
+        "shortCode": "ADD-GRAPHIFY-A",
+        "description": "AI-DLC Intent: add-graphify-and-ci",
+        "dataFile": "i2-add-graphify-and-ci.json"
+      },
+      {
+        "shortCode": "ADD-JOB-MATCHE",
+        "description": "AI-DLC Intent: add-job-matcher-cli",
+        "dataFile": "i3-add-job-matcher-cli.json"
+      },
+      {
+        "shortCode": "ADD-OPENAPI-RE",
+        "description": "AI-DLC Intent: add-openapi-release-artifact",
+        "dataFile": "i4-add-openapi-release-artifact.json"
+      },
+      {
+        "shortCode": "ADD-SALARY-RAN",
+        "description": "AI-DLC Intent: add-salary-range-field",
+        "dataFile": "i5-add-salary-range-field.json"
+      },
+      {
+        "shortCode": "FIX-PLAYGROUND",
+        "description": "AI-DLC Intent: fix-playground-ui-parity",
+        "dataFile": "i6-fix-playground-ui-parity.json"
+      },
+      {
+        "shortCode": "PROJECT-WIKI",
+        "description": "AI-DLC Intent: project-wiki",
+        "dataFile": "i7-project-wiki.json"
+      }
+    ]
+  },
+  "fpConfig": {
+    "fpWeights": {
+      "EI": {
+        "L": 3,
+        "A": 4,
+        "H": 6,
+        "name": "External Input",
+        "description": "An elementary process that processes data or control information from outside the application boundary.",
+        "examples": [
+          "Flight search form",
+          "Passenger details entry",
+          "Payment form submission"
+        ]
+      },
+      "EO": {
+        "L": 4,
+        "A": 5,
+        "H": 7,
+        "name": "External Output",
+        "description": "An elementary process that generates data or control information sent outside the application boundary.",
+        "examples": [
+          "Booking confirmation PDF",
+          "Email itinerary",
+          "Price comparison report"
+        ]
+      },
+      "EQ": {
+        "L": 3,
+        "A": 4,
+        "H": 6,
+        "name": "External Inquiry",
+        "description": "An elementary process that retrieves data from ILF/EIF without calculations or derived data.",
+        "examples": [
+          "Flight search results",
+          "Seat availability check",
+          "Booking details view"
+        ]
+      },
+      "ILF": {
+        "L": 7,
+        "A": 10,
+        "H": 15,
+        "name": "Internal Logical File",
+        "description": "A user-identifiable group of logically related data maintained within the application boundary.",
+        "examples": [
+          "Bookings table",
+          "User profiles",
+          "Payment records"
+        ]
+      },
+      "EIF": {
+        "L": 5,
+        "A": 7,
+        "H": 10,
+        "name": "External Interface File",
+        "description": "A user-identifiable group of logically related data referenced but not maintained by the application.",
+        "examples": [
+          "Airline schedules API",
+          "Airport codes reference",
+          "Currency exchange rates"
+        ]
+      }
+    },
+    "gscDefinitions": [
+      {
+        "id": 1,
+        "name": "Data Communications",
+        "description": "Degree to which the application communicates with external systems",
+        "default": 5
+      },
+      {
+        "id": 2,
+        "name": "Distributed Data Processing",
+        "description": "Degree to which data is transferred between components",
+        "default": 3
+      },
+      {
+        "id": 3,
+        "name": "Performance",
+        "description": "User-stated response time or throughput objectives",
+        "default": 4
+      },
+      {
+        "id": 4,
+        "name": "Heavily Used Configuration",
+        "description": "Degree to which hardware restrictions influence the application",
+        "default": 2
+      },
+      {
+        "id": 5,
+        "name": "Transaction Rate",
+        "description": "Rate at which transactions are processed",
+        "default": 4
+      },
+      {
+        "id": 6,
+        "name": "Online Data Entry",
+        "description": "Percentage of information entered online",
+        "default": 5
+      },
+      {
+        "id": 7,
+        "name": "End-User Efficiency",
+        "description": "Design emphasis on end-user efficiency",
+        "default": 5
+      },
+      {
+        "id": 8,
+        "name": "Online Update",
+        "description": "Degree of online update for ILFs",
+        "default": 4
+      },
+      {
+        "id": 9,
+        "name": "Complex Processing",
+        "description": "Degree of complex processing logic",
+        "default": 3
+      },
+      {
+        "id": 10,
+        "name": "Reusability",
+        "description": "Degree to which application is designed for reuse",
+        "default": 4
+      },
+      {
+        "id": 11,
+        "name": "Installation Ease",
+        "description": "Ease of installation and conversion",
+        "default": 4
+      },
+      {
+        "id": 12,
+        "name": "Operational Ease",
+        "description": "Ease of operation and minimal intervention",
+        "default": 4
+      },
+      {
+        "id": 13,
+        "name": "Multiple Sites",
+        "description": "Application designed for multiple sites/organizations",
+        "default": 3
+      },
+      {
+        "id": 14,
+        "name": "Facilitate Change",
+        "description": "Application designed to facilitate change",
+        "default": 4
+      }
+    ],
+    "vafBase": 0.65,
+    "vafIncrement": 0.01
+  },
+  "effortConfig": {
+    "techStackFactors": {
+      "python": {
+        "label": "Python / FastAPI backend",
+        "icon": "mdi:language-python"
+      },
+      "nextjs": {
+        "label": "Next.js / TypeScript front end",
+        "icon": "mdi:language-typescript"
+      },
+      "agents": {
+        "label": "LLM agents & MCP",
+        "icon": "mdi:robot-outline"
+      },
+      "devops": {
+        "label": "Docker / CI",
+        "icon": "mdi:cloud-cog"
+      }
+    },
+    "productivityFactors": {
+      "aiAssisted": {
+        "factor": 0.65,
+        "label": "AI-Assisted Delivery",
+        "description": "Middle of the delivery continuum \u2014 human-led build with an AI agent assisting. The human still owns the work."
+      },
+      "aiNative": {
+        "factor": 0.03,
+        "label": "AI-Native Delivery (agent-led)",
+        "description": "Far end of the continuum \u2014 the agent produces the bulk and the human steers, reviews and approves. ILLUSTRATIVE AND UNCALIBRATED: 0.03 against a nominal 8 h/FP reconstructs a ~15 min/FP working figure. Replace with a measured value once pre-estimates and actuals have been captured."
+      },
+      "experiencedTeam": {
+        "factor": 0.8,
+        "label": "Experienced Team",
+        "description": "Domain expertise already in place."
+      },
+      "componentReuse": {
+        "factor": 0.7,
+        "label": "Component Reuse",
+        "description": "Substantial existing components reused."
+      },
+      "prototyping": {
+        "factor": 0.5,
+        "label": "Rapid Prototyping",
+        "description": "POC/demo depth rather than production hardening."
+      }
+    },
+    "sdlcPhases": [
+      {
+        "id": "requirements",
+        "code": "REQ",
+        "name": "Requirements & Analysis",
+        "percentage": 10,
+        "icon": "mdi:file-document-edit",
+        "color": "#8b5cf6",
+        "description": "Business analysis, user stories, acceptance criteria"
+      },
+      {
+        "id": "design",
+        "code": "DGN",
+        "name": "Design & Architecture",
+        "percentage": 15,
+        "icon": "mdi:draw",
+        "color": "#3b82f6",
+        "description": "UI/UX design, system design, API specifications"
+      },
+      {
+        "id": "development",
+        "code": "DEV",
+        "name": "Development & Coding",
+        "percentage": 40,
+        "icon": "mdi:code-braces",
+        "color": "#22c55e",
+        "description": "Implementation, unit testing, code reviews"
+      },
+      {
+        "id": "testing",
+        "code": "TST",
+        "name": "Testing & QA",
+        "percentage": 20,
+        "icon": "mdi:test-tube",
+        "color": "#f59e0b",
+        "description": "Integration testing, UAT, performance testing"
+      },
+      {
+        "id": "release",
+        "code": "REL",
+        "name": "Deployment & Release",
+        "percentage": 10,
+        "icon": "mdi:rocket-launch",
+        "color": "#ef4444",
+        "description": "CI/CD, staging, production deployment"
+      },
+      {
+        "id": "pmo",
+        "code": "PMO",
+        "name": "Project Management",
+        "percentage": 5,
+        "icon": "mdi:account-supervisor",
+        "color": "#6b7280",
+        "description": "Planning, coordination, stakeholder management"
+      }
+    ]
+  },
+  "statusDefinitions": {
+    "completed": {
+      "label": "Implemented",
+      "description": "Unit of work delivered."
+    },
+    "partial": {
+      "label": "Verified",
+      "description": "Delivered and independently verified."
+    },
+    "in-progress": {
+      "label": "In Progress",
+      "description": "Open unit of work."
+    },
+    "roadmap": {
+      "label": "Proposed",
+      "description": "Proposed, not yet approved."
+    },
+    "beta": {
+      "label": "Approved",
+      "description": "Approved at the Inception Gate, construction not complete."
+    }
+  },
+  "glossary": [
+    {
+      "term": "Mob Elaboration",
+      "fullName": "Mob Elaboration (ceremony)",
+      "definition": "The Inception ceremony where the plan is drafted; the owner reviews and requests changes."
+    },
+    {
+      "term": "Inception Gate",
+      "fullName": "Inception Gate (ceremony)",
+      "definition": "The approval point where open questions must be settled before construction starts."
+    },
+    {
+      "term": "Rubric",
+      "fullName": "Eval Rubric",
+      "definition": "The answer key for grading an eval \u2014 criteria and procedure, written before the code exists."
+    },
+    {
+      "term": "HARD / SOFT",
+      "fullName": "Eval severity",
+      "definition": "HARD evals block progress; SOFT evals are advisory."
+    }
+  ]
+}

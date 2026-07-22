@@ -1,0 +1,120 @@
+{
+  "id": "add-graphify-and-ci",
+  "name": "Add Graphify And CI",
+  "status": "completed",
+  "features": [
+    {
+      "name": "Bolt 1 \u2014 Implementation",
+      "capabilities": [
+        {
+          "name": "Full graphify generation enabled: workflow now runs graphify update (extraction + Leiden/Louvain communities + graph.html + GRAPH_REPORT.md, determini",
+          "type": "EO",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "github/workflows/release.yml \u2014 python-semantic-release from Conventional Commits; bumps backend version files, tags v*, GitHub Release; Conventional C",
+          "type": "EI",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "RUNBOOK.md \u2014 setup, gh secrets-from-.env, workflow ops, release flow, Docker, local graphify",
+          "type": "EQ",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "env.example \u2014 concise, grouped, minimal comments",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Graphify run green with graphify update; root gains graph.html + GRAPH_REPORT.md; index still \u2264 50 KB",
+          "type": "EO",
+          "complexity": "H",
+          "status": "in-progress"
+        },
+        {
+          "name": "Release workflow: non-conventional push exits cleanly (no release); first feat:/fix: commit produces v0.x.y tag + GitHub Release + semver Docker tags",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "in-progress"
+        },
+        {
+          "name": "Copy scripts/graphify-build.py from templrgo (repo-generic, verbatim)",
+          "type": "EI",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Adapt scripts/graphify-index.py (module roots for this repo, RBAC cross-referencing removed)",
+          "type": "EI",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "github/workflows/graphify.yml \u2014 root-of-main storage divergence, [skip graphify] loop guard, failure tracking issue, optional OPENAI_API_KEY",
+          "type": "EI",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "github/workflows/build-and-publish.yml \u2014 GHCR publish via GITHUB_TOKEN, privacyshield tag strategy",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Interim root Dockerfile + .dockerignore (prototype CLI image)",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Secrets audit: privacyshield has none to copy (GHCR uses GITHUB_TOKEN); templrgo's OPENAI_API_KEY value is not recoverable (write-only) and no local .",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Graphify run green (2026-07-11, dispatch run): bot committed 344b6eb with all three root graph files; the push-triggered run was correctly skipped by ",
+          "type": "EI",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Build & publish run green (2026-07-11, push run for c619f2e)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Image behaviour verified locally pre-push on the identical Dockerfile (usage prints with an API key set; SIGILL fixes baked in \u2014 see proposal acceptan",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Manual, owner: flip GHCR package visibility to public (package settings \u2014 no API for this)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        },
+        {
+          "name": "Owner set the OPENAI_API_KEY repo secret (2026-07-11); suggested Actions variable OPENAI_MODEL=gpt-5-mini (bulk extraction workload \u2014 mini tier suffic",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Status \u2192 verified; then archive per openspec convention",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        }
+      ]
+    }
+  ]
+}

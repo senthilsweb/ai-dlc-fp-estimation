@@ -1,0 +1,253 @@
+{
+  "id": "add-demo-stack-and-playground",
+  "name": "Add Demo Stack And Playground",
+  "status": "completed",
+  "features": [
+    {
+      "name": "Bolt 1 \u2014 mcp-chat-client public Docker image",
+      "capabilities": [
+        {
+          "name": "mcp-chat-client/Dockerfile \u2014 multi-stage: Node 20 build of the demo page (npm run build = tsc && vite build against the default vite.config.ts, i.e. t",
+          "type": "EQ",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "mcp-chat-client/docker/nginx.conf + docker/runtime-config.js.template + docker/entrypoint.sh (installed as /docker-entrypoint.d/40-runtime-config.sh, ",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "src/lib/env.ts \u2014 apiEndpoint reads window.__MCP_CHAT_CONFIG__?.agentServiceUrl first, falling through to VITE_API_ENDPOINT / the existing hardcoded de",
+          "type": "EI",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "mcp-chat-client/.github/workflows/build-and-publish.yml \u2014 modeled directly on agent-job-matcher's existing workflow; publishes ghcr.io/senthilsweb/mcp",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "mcp-chat-client/openspec/changes/add-demo-stack-and-playground/ stub proposal \u2014 cross-references this spec (the driving change lives here since it's t",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Verification (2026-07-12, real docker build/docker run, not assumed): built mcp-chat-client:local clean; ran it with AGENT_SERVICE_URL=http://testhost",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 2 \u2014 docker-compose.yaml wiring (all three new services)",
+      "capabilities": [
+        {
+          "name": "chat-demo (:8091), playground (:3011), openapi-docs (:3012) services added to the root compose file, per specs/docker-compose-stack/spec.md. Ports del",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "playground/openapi-docs default API_URL to the compose network hostname http://api:8000, not localhost; chat-demo defaults AGENT_SERVICE_URL to http:/",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "chat-demo's build: points at ../mcp-chat-client (works only for a side-by-side checkout); the published image: is the primary path, matching the exist",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Verification (2026-07-12, real docker compose up/down, not assumed): docker compose config validates the full resolved file with no errors. Brought up",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 3 \u2014 playground/ Next.js app",
+      "capabilities": [
+        {
+          "name": "Scaffold (create-next-app App Router + Tailwind v4 + shadcn/ui init --defaults) under agent-job-matcher/playground/. shadcn's current CLI defaults to ",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Slack-purple theme: Tailwind v4 is CSS-first (no tailwind.config.js) \u2014 the brand ramp and --primary/--ring overrides live in app/globals.css's @theme ",
+          "type": "EI",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Left sidebar: components/playground/resume-dropzone.tsx (drag/drop + click, matches SUPPORTED_EXTENSIONS), job-link-list.tsx (dynamic add/remove rows)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "app/api/analyze/route.ts \u2014 server-side proxy, API_URL never reaches the browser; passes the backend's typed response through unmodified",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "lib/types.ts \u2014 hand-mirrors job_matcher/schemas.py's JobOutcome union exactly (verified field-by-field against the real schema and a real API response",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "components/playground/report-card.tsx + score-bar.tsx + results-panel.tsx: compact cards, match-band badge colors 1:1 from MatchStatus, sub-score bars",
+          "type": "EO",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "playground/Dockerfile \u2014 Next.js output: \"standalone\" build, non-root user, API_URL read at request time",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Real bug found and fixed during verification (2026-07-12): ResumeDropzone's hidden <input type=file> is nested inside the clickable <button> (so the w",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Environment finding (2026-07-12, not a code bug): next dev (Turbopack) in this sandbox has a broken HMR WebSocket (net::ERR_INVALID_HTTP_RESPONSE) tha",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Verification (2026-07-12, real Playwright + a live backend + real LLM calls, not assumed): (1) single-job submission \u2014 synthetic-resume.pdf + Gusto's ",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 4 \u2014 openapi-docs/ Next.js app",
+      "capabilities": [
+        {
+          "name": "Scaffold under agent-job-matcher/openapi-docs/; installed @scalar/nextjs-api-reference. Its ApiReference(config) returns a route-handler function that",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Slack-purple theme: Scalar's built-in theme: \"purple\" preset as a base, with a customCss override pinning --scalar-color-accent to the exact #4a154b (",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "openapi-docs/Dockerfile (Next.js standalone build, same shape as playground/Dockerfile)",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Verification (2026-07-12, real Playwright against the live backend, not assumed): full page render confirms project title/description, v0.4.0/OpenAPI ",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 5 \u2014 README additions",
+      "capabilities": [
+        {
+          "name": "\"REST endpoints\" table \u2014 both backend (/analyze, /resume/jsonresume, /health) and agent-service (/chat/stream, /upload, /health) routes, confirmed aga",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "\"Key environment variables\" section \u2014 grouped subset (model/keys, pipeline, agent-service, templates, telemetry), pointer to .env.example for the full",
+          "type": "ILF",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "\"Cover letter templates\" section \u2014 default template path, placeholders, and the TEMPLATES_DIR override, verified against prompts.py's actual load_temp",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "\"Quick start\" gained a third block for docker compose up -d (the full demo stack) with the three new services' ports and one-line descriptions; \"Relat",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 7 \u2014 Correction: containerize the MCP Bridge, renumber the whole stack",
+      "capabilities": [
+        {
+          "name": "mcp/agent-service/Dockerfile (new) \u2014 the MCP server (mcp/index.js) has no network port of its own; it's a pure stdio bridge spawned as a child process",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "docker-compose.yaml \u2014 new agent-service service; chat-demo's AGENT_SERVICE_URL now defaults to http://agent-service:<port> instead of the host.docker.",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Real bug found while picking port 6000 specifically (2026-07-12): port 6000 is on the WHATWG Fetch spec's \"bad ports\" blocklist (the historical X11 po",
+          "type": "EIF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Renumbered every service: api 6010, agent-service 6011, playground 6012, openapi-docs 6013, chat-demo 6014 \u2014 internal container ports match published ",
+          "type": "EQ",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Verified (2026-07-12, real containers, real end-to-end chat and analyze calls, not assumed): docker compose up -d (full stack, no manual steps) brough",
+          "type": "EQ",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Bolts 1-5 all implemented and individually verified with real builds, real containers, and real backend calls (see each bolt's evidence above) \u2014 no mo",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Bolt 7 closes the two items previously left out of scope: the agent-service (MCP Bridge) is now containerized, and the whole stack uses one consistent",
+          "type": "EI",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Owner: final review pass, then status \u2192 verified and archive per convention. mcp-chat-client's two previously-logged defects (history losing the uploa",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        }
+      ]
+    }
+  ]
+}

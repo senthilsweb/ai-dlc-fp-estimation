@@ -1,0 +1,101 @@
+{
+  "id": "add-salary-range-field",
+  "name": "Add Salary Range Field",
+  "status": "completed",
+  "features": [
+    {
+      "name": "Bolt 0 \u2014 Groundwork",
+      "capabilities": [
+        {
+          "name": "backend/job_matcher/schemas.py \u2014 salary_range: str | None = None on JobAnalysis",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "backend/job_matcher/prompts/analysis_system.txt \u2014 verbatim-only extraction rule, null when absent",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "backend/job_matcher/api.py \u2014 OpenAPI example response updated",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "backend/tests/test_schema_conformance.py \u2014 test_salary_range_defaults_to_none_and_accepts_a_verbatim_string",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "playground/lib/types.ts + report-card.tsx \u2014 rendered in the collapsed accordion trigger, next to company name",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Verified (2026-07-12): - Offline suite: 111/111 passing (110 pre-existing + 1 new) - Real extraction: docker compose run --rm cli analyze against eval",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 2 \u2014 Correction: multi-location postings, currency-neutral display",
+      "capabilities": [
+        {
+          "name": "Root cause, confirmed by fetching the real page text, not guessed: the posting doesn't state a min-max range at all \u2014 it states two different *locatio",
+          "type": "EIF",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "analysis_system.txt + schemas.py's doc comment \u2014 explicit rule for multi-location disclosures: capture ALL location-tied figures with their location c",
+          "type": "ILF",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Verified: re-ran the exact same Bain URL \u2014 now returns both figures with their location context, not just one",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "report-card.tsx \u2014 swapped the DollarSign icon (a literal $ glyph, hardcoding a USD assumption the field itself never made) for Banknote (currency-neut",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Confirmed no currency is hardcoded anywhere in the extraction path itself (schema/prompt were already currency-neutral; only the icon was USD-specific",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "111/111 offline tests still pass; playground build clean",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "All acceptance criteria in proposal.md met with real evidence, including the Bolt 2 correction",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Owner: re-review, then status \u2192 verified and archive",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        }
+      ]
+    }
+  ]
+}

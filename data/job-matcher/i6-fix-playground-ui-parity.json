@@ -1,0 +1,258 @@
+{
+  "id": "fix-playground-ui-parity",
+  "name": "Fix Playground UI Parity",
+  "status": "completed",
+  "features": [
+    {
+      "name": "Bolt 1 \u2014 Header + chrome parity",
+      "capabilities": [
+        {
+          "name": "app/api/health/route.ts \u2014 proxy to ${API_URL}/health",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "lib/use-backend-status.ts \u2014 polls /api/health every 5s, three states, mirrors mcp-chat-client's useBackendStatus() exactly",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "components/playground/status-pill.tsx \u2014 colored ring-badge + dot, mirrors both privacyshield and mcp-chat-client's header pill shape",
+          "type": "EI",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "app/page.tsx header \u2014 icon + title + subtitle + the live status pill, h-16 bar with bottom border, matching both references' structure",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "sidebar-form.tsx \u2014 rebuilt as a Card/CardHeader/CardTitle/ CardDescription composition with Label-paired inputs, same shape as privacyshield/frontend/",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Sidebar width lg:w-80 (320px) \u2192 lg:w-96 (384px)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 2 \u2014 Sticky submit button",
+      "capabilities": [
+        {
+          "name": "sidebar-form.tsx \u2014 split into a scrollable CardContent region (min-h-0 flex-1 overflow-y-auto) and a non-scrolling sticky bottom-0 footer for the Subm",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Verified (2026-07-12, real Playwright): added 6 job-link rows \u2014 Submit button's bounding box (y: 902, height: 32 in a 950px-tall viewport) confirmed f",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 3 \u2014 Wide accordion + expand affordance",
+      "capabilities": [
+        {
+          "name": "app/page.tsx \u2014 removed the mx-auto max-w-3xl wrapper entirely in the rebuild; results now use the full main-content width",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "report-card.tsx \u2014 trigger gained hover:bg-accent/40, a persistent \"Click to expand full report\" hint row, and the whole card gained hover:shadow-md tr",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "components/ui/accordion.tsx \u2014 chevron icon size-4 \u2192 size-5, recolored to text-brand-700 (shared primitive, only usage in this app, safe to bump app-wi",
+          "type": "EI",
+          "complexity": "L",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 4 \u2014 Industry-standard match-status colors",
+      "capabilities": [
+        {
+          "name": "lib/types.ts \u2014 MATCH_STATUS_CLASSES: strong_match purple \u2192 emerald-600 (green), good_match \u2192 lime-500 (lighter green, was already emerald \u2014 now distin",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 5 \u2014 Cover letter: collapsible + copy-to-clipboard",
+      "capabilities": [
+        {
+          "name": "npx shadcn add collapsible label",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "components/playground/cover-letter-section.tsx \u2014 collapsed by default, cover_letter_text rendered whitespace-pre-wrap, chevron rotates on open via Bas",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Copy button \u2014 navigator.clipboard.writeText, icon swaps Copy\u2192Check for 1.5s, no toast library (matches privacyshield's OutputCard.handleCopy pattern, ",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Real Playwright run against the live backend (2026-07-12, not assumed): header status pill shows genuine \"Backend online\" (polling /api/health); Card-",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Docker image rebuilt and reverified standalone (API_URL=http://host.docker.internal:8000) \u2014 /api/health returns {\"status\":\"online\"} inside the contain",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "The owner's live UAT compose service (playground at localhost:3011) rebuilt and restarted with these fixes so the same URL the owner was already testi",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Owner: re-review at http://localhost:3011, then status \u2192 verified and archive",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 6 \u2014 Correction: literal privacyshield template parity",
+      "capabilities": [
+        {
+          "name": "Extracted exact reference values first, from the live privacyshield container, not guessed: font Inter, ui-sans- serif, system-ui, sans-serif; nav rai",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "app/layout.tsx \u2014 swapped Geist/Geist_Mono for next/font/ google's Inter, matching privacyshield exactly",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "app/globals.css \u2014 found and fixed a real latent bug while investigating the font mismatch: --font-sans: var(--font- sans) was circular/self-referentia",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "components/playground/nav-rail.tsx (new) \u2014 direct structural port of privacyshield/frontend/src/components/Sidebar.tsx: brand-700 background, collapsi",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "app/page.tsx \u2014 restructured to [NavRail][header with burger toggle + page title/subtitle + status pill][form Card | results], matching privacyshield/f",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "components/playground/job-link-list.tsx \u2014 the \"add\" action is now a square (rounded-none), Slack-green (bg-slack-green) icon button placed directly ne",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Verified (2026-07-12, real Playwright against the live backend, compared directly against the real privacyshield container's computed styles, not assu",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Docker image rebuilt; owner's live UAT compose service (playground at localhost:3011) rebuilt and restarted with this correction",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Owner: re-review at http://localhost:3011",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 8 \u2014 Sharp corners, nav-rail scoring guide, Clear button, status-pill root cause",
+      "capabilities": [
+        {
+          "name": "components/ui/button.tsx \u2014 every variant/size now rounded-none (was rounded-lg / per-size rounded-[...] overrides) \u2014 sharp corners app-wide, not just ",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "components/playground/nav-rail.tsx \u2014 new ScoringGuide component fills the rail's previously-empty space below the one nav item: all 5 match bands, the",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "sidebar-form.tsx + app/page.tsx \u2014 new \"Clear\" button (ghost, left of \"Analyze fit\" in the sticky footer, privacyshield's Reset+Submit pattern) resets ",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Nav-rail single item label shortened from \"Analyze fit\" to \"Analyze\" \u2014 matches privacyshield's terse verb-only nav items (Detect/Anonymize/Enhance); t",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Status-pill \"Backend unreachable\" \u2014 root-caused, not a code bug (2026-07-12): while investigating, live-verified curl calls to the containerized api/a",
+          "type": "EI",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Verified (2026-07-12, real Playwright against the freshly rebuilt containers, not assumed): status pill correctly reads \"Backend online\"; scoring guid",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "All 8 bolts implemented and verified with real containers, real Playwright runs, and \u2014 this round \u2014 a real infrastructure incident root-caused rather ",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Owner: final re-review, then status \u2192 verified and archive",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,452 @@
+{
+  "id": "add-job-matcher-cli",
+  "name": "Add Job Matcher CLI",
+  "status": "completed",
+  "features": [
+    {
+      "name": "Bolt 0 \u2014 Inception gate",
+      "capabilities": [
+        {
+          "name": "Resolve open question 1 \u2014 resolved by owner (2026-07-11): pydantic-ai",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Resolve open question 2 \u2014 resolved by owner (2026-07-11): Typer",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Resolve open question 3 \u2014 resolved by owner (2026-07-11): synthetic resume committed; real resume local-only, gitignored",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Resolve open question 4 \u2014 resolved by owner (2026-07-11): JS rounding semantics via floor(x + 0.5)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Resolve open question 5 \u2014 resolved by owner (2026-07-11): JSON logs + OpenObserve REST sink; no OTel SDK in v1",
+          "type": "EIF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Resolve open question 6 \u2014 resolved by owner (2026-07-11): synchronous API returning the typed JSON array; no /runs endpoints, no workflow layer",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Codify logger + file-header conventions in AGENTS.md and backend/AGENTS.md (done with revision 3)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Proposal status \u2192 APPROVED (2026-07-11)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 1 \u2014 Package skeleton + deterministic core (no LLM)",
+      "capabilities": [
+        {
+          "name": "backend/pyproject.toml \u2014 package job_matcher, console script jobmatch (Typer, version command live), deps pinned, [otel] + [dev] extras, pytest marker",
+          "type": "EIF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "logging.py \u2014 the structlog factory per backend/AGENTS.md (JSON lines, ISO timestamps, ./logs/<entry>_<ts>.log + stdout, configure-once guard)",
+          "type": "EI",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "observability/ facade \u2014 @traced/@timed, contextvars propagation (verified across asyncio.gather), allowlist capture, env registry with json/none sinks",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "schemas.py \u2014 Pydantic port incl. the SkillMatch matched\u21d4evidence validator and the fetch_status-discriminated JobOutcome union",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "scoring.py \u2014 behaviour-identical port (formula, reallocation, bands, recommendations verbatim, js_round pinning 2.5\u21923)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "report.py \u2014 slugify + filename contract + report assembly + path-confined artifact writes",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Fixtures: JD/failure/adversarial + manifest copied verbatim; synthetic resume authored (fictional \"Jordan Rivera\" profile, generator committed); backe",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Offline suite green: 36 passed (pytest -m \"not live\") \u2014 scoring determinism, banding, slug/naming, schema conformance, observability; jobmatch version",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 2 \u2014 Inputs and fetch guards (no LLM)",
+      "capabilities": [
+        {
+          "name": "resume.py \u2014 pypdf/python-docx/txt/md extraction, normalized + 120-col wrapped output, scanned-PDF (min-words) and .doc rejection, byte cap; test_resum",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "fetch.py \u2014 one attempt code-enforced (no retry loop exists), scheme allowlist, SSRF hostname blocklist (pre-connect + post-redirect), byte cap, min-wo",
+          "type": "EIF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "test_fetch_guards.py green against the committed JS-shell captures; all guards verified to trip pre-connect (suite is network-free)",
+          "type": "EIF",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 3 \u2014 Generative step + pipeline + CLI",
+      "capabilities": [
+        {
+          "name": "config.py \u2014 .env discovery (walk up from cwd), MODEL_ANALYST \u2192 MODEL \u2192 ConfigError; typed knob accessors",
+          "type": "ILF",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "prompts.py + package-data prompts/ \u2014 Eve's extraction discipline ported verbatim (data-not-instructions frame, no-score rule, quote-grounded evidence)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "analyze.py \u2014 the one generative call: pydantic-ai Agent(output_type=JobAnalysis), token-usage capture",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "pipeline.py \u2014 per-job end-to-end asyncio tasks (semaphore-bounded, per-task graceful failure incl. analysis exceptions), typed list[JobOutcome], CLI p",
+          "type": "EI",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "cli.py \u2014 jobmatch analyze per spec; operator errors exit 2 with a clear message; completed runs exit 0 (verified all-failed)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "test_pipeline_offline.py (7 cases: mixed, all-failed, fan-out call counts, exception isolation, persistence contract, API mode) + test_embeddable_core",
+          "type": "EQ",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Prototype removed (app.py, old cli.py, job_fit_from_files.py, requirements-job-fit.txt, old prompts/templates incl. embedded candidate PII); Dockerfil",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Live smoke (2026-07-11, openai:gpt-5.4-mini): synthetic resume vs Anthropic JD + 1 failure fixture \u2192 79/good_match (inside the provisional band range)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "env.example at repo root (done early with Bolt 1, 2026-07-11): model vars, JOB_FANOUT_CONCURRENCY, OBSERVABILITY_SINK, TELEMETRY_RECORD_IO, and every ",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 4 \u2014 FastAPI surface",
+      "capabilities": [
+        {
+          "name": "api.py \u2014 POST /analyze (multipart + server-path) returning the typed JSON array (every element carries run_id), GET /health; no /runs, no /score, no s",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "test_api.py (7 cases: health, server-path + multipart analyze, exactly-one-resume-input rule, operator errors \u2192 422, format rejection, statelessness, ",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Decorator-only grep gate clean; @traced gained enrich= so even post-call span attributes (LLM token usage, gated IO capture) are declared at the decor",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Live server smoke (2026-07-11): uvicorn boot, GET /health ok, real POST /analyze (mini model) \u2192 Bain JD 74/good_match, typed array payload, nothing pe",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 5 \u2014 Telemetry backends (env-activated)",
+      "capabilities": [
+        {
+          "name": "observability/sinks.py \u2014 OpenObserveRestSink: batched POSTs to {url}/api/{org}/{stream}/_json, basic auth, flush on batch size and root-span end, one ",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "observability/otel_bridge.py \u2014 the only OTel import site: facade spans \u2192 OTel spans (nesting + real timestamps preserved), OpenInference attrs on the ",
+          "type": "EIF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Env registry wiring in configure(): backends join purely by their env vars; fan-out; OTLP env without the extra \u2192 startup error naming job-matcher[ote",
+          "type": "EI",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Tests (test_telemetry_backends.py, 7 cases): activation matrix, none-override, unreachable-OpenObserve resilience (one warning, run unaffected), batch",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Manual smoke, Arize AX (2026-07-12) \u2014 real bug found and fixed: owner configured ARIZE_SPACE_ID/ARIZE_API_KEY for real and reported zero telemetry arr",
+          "type": "EIF",
+          "complexity": "L",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 6 \u2014 JSON Resume extraction (revision 5)",
+      "capabilities": [
+        {
+          "name": "jsonresume.py \u2014 Pydantic mirror of JSON Resume v1.0.0, every section, extra=\"forbid\" at every level; meta.version stamped deterministically in code",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "extract_jsonresume() \u2014 one typed LLM call + deterministic grounding guard (email as normalized substring, phone as digits-only match \u2014 invented contac",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "POST /resume/jsonresume (multipart + server-path, persists nothing, documented with examples per AGENTS rule 9) + jobmatch jsonresume --resume <file> ",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Offline tests (8 cases: round trip, unknown-field rejection at root/basics/work, grounding accept/reject, version stamp, API contract); live smoke: sy",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 7 \u2014 MCP server (mcp/, revision 5)",
+      "capabilities": [
+        {
+          "name": "mcp/package.json + mcp/index.js \u2014 single-file server on @modelcontextprotocol/sdk, stdio, ctms model (MCP part only); tools analyze_job_fit, extract_j",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "configs/claude-desktop.json + configs/vscode-mcp.json; .env.example; README.md (covers both MCP + agent service)",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Node smoke (npm test, stub backend, 5 assertions green): tools/list, analyze pass-through incl. form fields, jsonresume, health, error\u2192isError",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Manual, owner: mount in Claude Desktop via the config and run one analyze \u2014 record evidence here (the same server is exercised live end-to-end by the ",
+          "type": "EI",
+          "complexity": "H",
+          "status": "in-progress"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 8 \u2014 Agent service (mcp/agent-service/, revision 6)",
+      "capabilities": [
+        {
+          "name": "app.py \u2014 POST /chat/stream (SSE: ctms content/done/error events, tool notices as \ud83d\udd27 content chunks via MCPToolset's process_tool_call hook), POST /uplo",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "LLM-2 loop: pydantic-ai Agent + MCPToolset(StdioTransport) over mcp/index.js (the 2.9 API \u2014 MCPServerStdio no longer exists); chat_system.txt prompt f",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "env.example gains MODEL_CHAT, JOBMATCHER_API_URL, AGENT_UPLOAD_DIR, AGENT_PORT; graphify watches mcp/**",
+          "type": "ILF",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Compose agent service sharing the upload volume \u2014 deferred: needs a python+node image (Dockerfile.agent); host-run verified instead, containerization ",
+          "type": "EQ",
+          "complexity": "H",
+          "status": "in-progress"
+        },
+        {
+          "name": "Tests (6 offline, LLM/MCP stubbed): SSE contract incl. tool notice + done ordering, empty-message and exception \u2192 error events, upload round trip + sa",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Full-chain live smoke (2026-07-11, acceptance criterion 16 sans chatbot UI): API :8000 + agent service :8006 (real mini model) \u2014 /health lists the 3 d",
+          "type": "ILF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Wire-level round trip verified (2026-07-11) against the real neutral chatbot (github.com/senthilsweb/mcp-chat-client, whose .env.example already ships",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Manual, owner \u2014 still open: the above proves the contract at the HTTP/SSE level, replicating the widget's logic exactly; it is not the same as clickin",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 9 \u2014 Live evals + verification",
+      "capabilities": [
+        {
+          "name": "Live suites under tests/live/ behind -m live: grounding (verbatim-evidence HARD + rerun-stability SOFT), injection (grounded, score recomputation, byt",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Full HARD sweep green: 11/11 live + 96 offline (openai:gpt-5.4-mini). Pre-requisite correction applied: the analysis prompt's evidence rule tightened ",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "SOFT observations recorded + band table recalibrated at the verification ceremony (rubrics.md \u00a73 Correction): Anthropic 84\u201385 strong, Bain 72 good, Gu",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "README rewritten (root: product overview, diagram, quick start, surfaces, evals; backend/: slim workspace pointer); last prototype leftovers removed (",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Status \u2192 IMPLEMENTED with the HARD gate passed and the SOFT review recorded. Flipping to VERIFIED awaits the two owner manual evidence items: Claude D",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 10 \u2014 Cover letter rendering (revision 7)",
+      "capabilities": [
+        {
+          "name": "candidate.py \u2014 deterministic extractors (email, phone, github, linkedin, website, name) over already-extracted resume text; contact_line() joins which",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "job_matcher/templates/cover_letter.txt \u2014 package-data default template, exact text from the design doc; added to pyproject.toml's package-data alongsi",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "prompts.py's load_template() gains the package-default fallback (matching load_prompt()'s resolution order) \u2014 corrects the earlier \"no package default",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "pipeline.py: candidate identity + a run-level date string extracted once in run_analysis() (after extract_resume_text(), not per job) and threaded thr",
+          "type": "EI",
+          "complexity": "H",
+          "status": "completed"
+        },
+        {
+          "name": "Tests (13 new: 8 test_candidate.py, 5 test_cover_letter.py) incl. deliberately-missing-field fixtures (omission, not placeholder), default-template-wi",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Live smoke (2026-07-11, openai:gpt-5.4-mini): synthetic resume vs the Anthropic JD \u2192 79/good_match, and cover_letter_text rendered the full header wit",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Full offline sweep re-run clean (109/109); this bolt's completion re-opens the VERIFIED gate check alongside the two pre-existing manual evidence item",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

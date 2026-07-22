@@ -1,0 +1,94 @@
+{
+  "id": "project-wiki",
+  "name": "Project Wiki",
+  "status": "beta",
+  "features": [
+    {
+      "name": "Bolt 1 \u2014 Pages",
+      "capabilities": [
+        {
+          "name": "1.1 docs/index.md",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "1.2 docs/getting-started.md",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "1.3 docs/installation.md",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "1.4 docs/configuration.md",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "1.5 docs/surfaces.md",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "1.6 docs/runbook.md (RUNBOOK.md content relocated; root file becomes a pointer)",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "1.7 docs/faq.md",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 2 \u2014 Front door + site",
+      "capabilities": [
+        {
+          "name": "2.1 README trimmed to front door (intro, diagram, quickstart table, docs list, layout)",
+          "type": "EQ",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "2.2 mkdocs.yml + .github/workflows/docs.yml (strict build, mkdocs<2 pin, deploy-pages); site/ gitignored",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "2.3 Pages enabled (build_type=workflow); site verified serving",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "Bolt 3 \u2014 Consistency pass (owner 2026-07-14, with ai-agents wiki-live-pages)",
+      "capabilities": [
+        {
+          "name": "3.1 FAQ renamed to \"FAQ\" (nav, H1, referring links)",
+          "type": "EI",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "3.2 Markdown capability parity: footnotes, details, tabbed, tablesort (mermaid already present)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

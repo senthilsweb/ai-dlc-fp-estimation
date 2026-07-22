@@ -1,0 +1,66 @@
+{
+  "id": "add-openapi-release-artifact",
+  "name": "Add Openapi Release Artifact",
+  "status": "completed",
+  "features": [
+    {
+      "name": "Bolt 1 \u2014 Implementation",
+      "capabilities": [
+        {
+          "name": "scripts/export-openapi.py \u2014 app import (no server), json + yaml dump, graceful \"API not present yet\" skip",
+          "type": "EO",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "github/workflows/openapi-spec.yml \u2014 separate action: on release published + dispatch; generate \u2192 validate (openapi-spec-validator) \u2192 gh release upload",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "AGENTS.md \u2014 API-documentation convention (rule 9)",
+          "type": "EQ",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "api.py app metadata: project description, version from __version__, license/contact, externalDocs \u2192 repo URL",
+          "type": "EIF",
+          "complexity": "L",
+          "status": "completed"
+        },
+        {
+          "name": "Every endpoint: summary + Markdown description + fixture-sourced request/response examples (openapi_extra)",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Offline test test_openapi_docs.py: summary/description/example coverage per path+method, info/externalDocs present, spec passes openapi-spec-validator",
+          "type": "EIF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "openapi-spec-validator + pyyaml added to backend [dev]; scripts/export-openapi.py verified producing openapi.json+yaml locally (title/version/external",
+          "type": "EIF",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Evidence (2026-07-11): release v0.2.1 carries openapi.json + openapi.yaml, attached automatically by the workflow_run-chained OpenAPI workflow after s",
+          "type": "EI",
+          "complexity": "A",
+          "status": "completed"
+        },
+        {
+          "name": "Owner: confirm a Postman import of the attached spec, then status \u2192 verified and archive",
+          "type": "EI",
+          "complexity": "A",
+          "status": "in-progress"
+        }
+      ]
+    }
+  ]
+}
