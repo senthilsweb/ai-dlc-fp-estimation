@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 <!-- OPENSPEC:START -->
 # OpenSpec Instructions
 
@@ -20,6 +24,31 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 ## Project
 
 A single Go binary that serves a generic Function Point / WBS estimator SPA (`app/index.html`) plus one or more project datasets (`data/<app-name>/*.json`). The active dataset is chosen at runtime via config (`FP_APP` env var / `--app` flag), not baked into the binary or the HTML.
+
+## Commands
+
+```bash
+go build -o fp-estimator .        # or: make build
+FP_APP=ai-agents-provly ./fp-estimator   # or: FP_APP=tripma ./fp-estimator; or go run . --app <name>
+make build-linux / make build-darwin     # cross-compile
+make docker                              # build the Docker image
+docker compose up --build                # run via compose (reads .env — cp .env.example .env first)
+
+# Manual smoke test (there is no automated test suite — see openspec/project.md's Testing Strategy):
+curl "http://localhost:8080/api/data"              # active dataset
+curl "http://localhost:8080/api/data?app=tripma"   # override for a specific dataset
+curl "http://localhost:8080/api/apps"              # list dataset folders under data/
+```
+
+There is no linter or formatter configured beyond `gofmt` conventions; there is no JS build step by design (see ADR-0003) — `app/index.html` is served as-is.
+
+## Architecture
+
+Request flow: `main.go` embeds `app/` and `data/` via `//go:embed`, reads `FP_APP`/`FP_PORT`/`--app`/`--port` at startup, and fails fast if the configured dataset directory doesn't exist under `data/`. It registers exactly three routes: `GET /api/data` and `GET /api/apps` (`server/handler/data.go`), and everything else falls through `r.NoRoute` to `server/handler/spa.go`'s embedded-FS SPA handler (serves the requested static file, or `index.html` as the SPA fallback).
+
+`server/handler/data.go` is the one piece of real logic on the server side: `buildAppData()` reads `data/<appId>/metadata.json`, resolves its `projectConfig`/`fpConfig`/`effortConfig` sub-blocks (falling back to top-level fields for older flat-schema datasets), joins in each product's JSON file via the `dataFile` reference in `metadata.json`'s product list, optionally folds in `tech-stack.json`, tallies capability status counts, and returns one merged JSON object — the same shape the predecessor forks used to produce via a `combine-wbs.js` Node script, but computed fresh on every request instead of as a build artifact.
+
+`app/index.html` is a single-file SPA (vanilla JS, Tailwind/Iconify/SheetJS via CDN, no bundler). On load it fetches `/api/data`, sets `dataNamespace` from the response's `appId` (see `nsKey()`), and renders everything — title, WBS tree, FP/GSC calculations, status legend, exports — from that one payload. It has three layers of inclusion state (product → feature → capability), each cascading from its parent, persisted to `localStorage` under the dataset-namespaced keys.
 
 ## Non-negotiables
 
