@@ -28,11 +28,17 @@ A single Go binary that serves a generic Function Point / WBS estimator SPA (`ap
 ## Commands
 
 ```bash
-go build -o fp-estimator .        # or: make build
+go build -o fp-estimator .        # or: make build — Go is required for this step, once
 FP_APP=ai-agents-provly ./fp-estimator   # or: FP_APP=tripma ./fp-estimator; or go run . --app <name>
+FP_PORT=8081 ./fp-estimator              # pick a port if the default is taken (also: make run PORT=8081 APP=tripma)
 make build-linux / make build-darwin     # cross-compile
 make docker                              # build the Docker image
 docker compose up --build                # run via compose (reads .env — cp .env.example .env first)
+
+# Dev loop without rebuilding: after the one build above, --dev serves app/ and
+# data/ live from disk — edit app/index.html or data/<app>/*.json and just
+# refresh the browser (see ADR-0006). Must run from the repo root.
+FP_DEV=true ./fp-estimator     # or: make dev
 
 # Manual smoke test (there is no automated test suite — see openspec/project.md's Testing Strategy):
 curl "http://localhost:8080/api/data"              # active dataset

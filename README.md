@@ -17,6 +17,28 @@ cp .env.example .env
 docker compose up --build
 ```
 
+### Port already in use?
+
+```bash
+FP_PORT=8081 ./fp-estimator          # or: ./fp-estimator --port 8081
+make run PORT=8081 APP=tripma        # Makefile shortcut, also lets you pick the dataset
+```
+
+A busy port fails fast with a message telling you to pick another, instead of a bare bind error.
+
+### Iterating without rebuilding (`--dev`)
+
+`app/` and `data/` are normally compiled into the binary (`//go:embed`), so by default even a one-line HTML or dataset tweak needs a `go build` to see it. Go is only required **once**, to produce the binary — but you can skip rebuilding on every content edit with `--dev` / `FP_DEV=true`, which serves `app/` and `data/` live from disk instead:
+
+```bash
+go build -o fp-estimator .           # once
+FP_DEV=true ./fp-estimator           # or: make dev
+# now edit app/index.html or any data/<app>/*.json and just refresh the browser —
+# no rebuild needed until you change main.go or server/handler/*.go
+```
+
+`--dev` must be run from the repo root (it resolves `app/` and `data/` relative to the current directory). See [ADR-0006](docs/adr/0006-dev-mode-serves-live-filesystem.md) for why this isn't the default.
+
 ## Architecture
 
 ```
@@ -54,6 +76,7 @@ See `.claude/skills/add-fp-dataset/SKILL.md` for the step-by-step checklist.
 |---|---|---|---|
 | `FP_PORT` | `--port` | `8080` | Listen port |
 | `FP_APP` | `--app` | `ai-agents-provly` | Which `data/<name>/` partition to serve by default |
+| `FP_DEV` | `--dev` | `false` | Serve `app/` and `data/` live from disk instead of the embedded copies — no rebuild needed to see edits |
 | `FP_LOG_LEVEL` | `--log-level` | `info` | Log verbosity |
 | `FP_LOG_FORMAT` | `--log-format` | `text` | `text` or `json` |
 

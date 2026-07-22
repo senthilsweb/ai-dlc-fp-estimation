@@ -11,6 +11,7 @@ This directory records the architecturally significant decisions for this repo, 
 | [0003](0003-merge-datasets-in-go-at-request-time.md) | Merge dataset JSON in Go at request time, not via a Node build step | Accepted |
 | [0004](0004-defer-access-control.md) | Defer access control | Accepted |
 | [0005](0005-namespace-client-state-by-active-dataset.md) | Namespace client-side state by the active dataset | Accepted |
+| [0006](0006-dev-mode-serves-live-filesystem.md) | Dev mode serves app/ and data/ live from disk | Accepted |
 
 ## When to add a new ADR
 
