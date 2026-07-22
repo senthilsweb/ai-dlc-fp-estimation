@@ -47,21 +47,37 @@ These two figures are the owner's working starting points. They are **not** deri
 
 ### How the rate is composed (implemented 2026-07-22)
 
+**Terminology.** *PDR* is **Project Delivery Rate** — hours to deliver one Function Point, the standard bridge from size to effort (`effort = size × PDR`). ISBSG publishes PDR benchmarks by language and platform, which is what makes an FP estimate externally defensible. **Nominal PDR** is the rate *before* any modifiers; **effective PDR** is what remains after them. The nominal/adjusted split mirrors COCOMO's nominal effort plus effort multipliers.
+
 PDR is **not** set directly to an AI-adjusted number. It composes, so each discount stays separately visible and separately calibratable:
 
 ```
-effective PDR = basePDR × techStackFactor × Π(active productivity factors)
+effective PDR = nominal PDR × Π(active productivity factors)
 hours         = AFP × effective PDR
 cost          = hours × rate
 ```
 
-`basePDR` is therefore the **unadjusted human baseline** for the stack and must not have an AI discount baked into it — that would double-count against the productivity factors.
+Nominal PDR is therefore the **human baseline before AI**, and the AI speedup lives *only* in the productivity factors. That gives the discount one source of truth.
+
+**The double-counting trap this avoids.** Nominal PDR and the productivity factors both express "how fast do we deliver":
+
+| Setup | Nominal PDR | Factors | Effective | |
+|---|---|---|---|---|
+| A | 0.25 | none | 0.25 | correct |
+| B | 8 | AI 0.65 × Reuse 0.7 | 3.64 | correct |
+| C | **0.25** | **AI 0.65** | **0.1625** | **AI counted twice** |
+
+Case C is easy to reach because both inputs are individually true statements ("we deliver ~15 min/FP", "we use AI agents") that encode the *same* speedup. The convention — nominal is pre-AI — prevents it.
+
+**Technology stack is documentation only.** It is recorded for optics and carried into generated proposals/SOWs, and deliberately does **not** drive hours or cost.
 
 The Effort & Cost tab renders the full chain so any number is auditable, e.g.:
 
 ```
-0.25 (base) × 1 (Admin Portal) × 0.65 (AI Copilot Assisted) × 0.7 (Component Reuse) = 0.114 h/FP
+8 (nominal) × 0.65 (AI Agent-Assisted) × 0.7 (Component Reuse) = 3.64 h/FP
 ```
+
+**Naming:** productivity factors must be vendor-neutral — "AI Agent-Assisted", "AI Agent-Led" — never product names.
 
 Why composition rather than a single blended PDR: when actuals arrive, a blended figure can't tell you *which* term was wrong. Composition can. That matters directly for §8.
 

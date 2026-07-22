@@ -452,8 +452,8 @@
                         <!-- Effective PDR composition -->
                         <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-5">
                             <div class="flex items-baseline justify-between flex-wrap gap-2 mb-3">
-                                <div class="font-semibold text-purple-900">Effective Delivery Rate</div>
-                                <div class="text-xs text-purple-700">base × tech stack × productivity factors</div>
+                                <div class="font-semibold text-purple-900">Effective Project Delivery Rate</div>
+                                <div class="text-xs text-purple-700">nominal PDR × productivity factors</div>
                             </div>
                             <div class="flex items-baseline gap-2 flex-wrap mb-2">
                                 <span class="text-3xl font-bold text-purple-700" id="effective-pdr">8</span>
@@ -464,10 +464,10 @@
 
                         <div class="grid md:grid-cols-3 gap-4 text-sm mb-5">
                             <div class="bg-gray-50 rounded-lg p-4">
-                                <label class="block font-semibold text-gray-700 mb-2" for="input-base-pdr">Base PDR</label>
+                                <label class="block font-semibold text-gray-700 mb-2" for="input-base-pdr">Nominal PDR</label>
                                 <input type="number" id="input-base-pdr" min="0.01" step="0.05"
                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-semibold text-purple-700">
-                                <div class="text-gray-500 text-xs mt-1">Unadjusted hours per FP (human baseline)</div>
+                                <div class="text-gray-500 text-xs mt-1">Hours per FP <strong>before</strong> AI adjustment — the human baseline. Don't pre-discount it; the factors below carry the AI speedup.</div>
                             </div>
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <label class="block font-semibold text-gray-700 mb-2" for="input-hours-day">Hours / Day</label>
@@ -485,14 +485,17 @@
 
                         <div class="grid md:grid-cols-2 gap-4 mb-5">
                             <div class="bg-gray-50 rounded-lg p-4">
-                                <label class="block font-semibold text-gray-700 mb-2 text-sm" for="input-tech-factor">Technology Stack</label>
-                                <select id="input-tech-factor" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 text-sm"></select>
-                                <div class="text-gray-500 text-xs mt-1">One dominant stack multiplier for this estimate</div>
-                            </div>
-                            <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="font-semibold text-gray-700 mb-2 text-sm">Productivity Factors</div>
                                 <div id="input-productivity-factors" class="space-y-1.5 max-h-44 overflow-y-auto"></div>
-                                <div class="text-gray-500 text-xs mt-2">Selected factors multiply together</div>
+                                <div class="text-gray-500 text-xs mt-2">Selected factors multiply together. These carry the AI speedup — leave Nominal PDR at the human baseline.</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <label class="block font-semibold text-gray-700 mb-2 text-sm" for="input-tech-factor">Technology Stack</label>
+                                <select id="input-tech-factor" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-gray-400 text-sm"></select>
+                                <div class="text-gray-500 text-xs mt-2 flex items-start gap-1">
+                                    <iconify-icon icon="mdi:information-outline" class="mt-0.5 flex-shrink-0"></iconify-icon>
+                                    <span>Recorded for documentation only — carried into proposals/SOWs. Does <strong>not</strong> affect hours or cost.</span>
+                                </div>
                             </div>
                         </div>
 
@@ -1664,11 +1667,8 @@
             updateStats();
         }
 
-        function techFactorValue() {
-            const f = wbsData.techStackFactors?.[assumptions.techFactorKey];
-            return numOr(f?.factor, 1);
-        }
-
+        // Tech stack is captured for documentation/optics only — it feeds proposal
+        // and SOW generation, and deliberately does NOT drive the numbers.
         function productivityFactorValue() {
             const all = wbsData.productivityFactors || {};
             return (assumptions.activeProductivityKeys || []).reduce((acc, key) => {
@@ -1678,7 +1678,7 @@
 
         // The single source of truth for hours-per-FP used by every calculation.
         function getEffectivePDR() {
-            return numOr(assumptions.basePDR, 8) * techFactorValue() * productivityFactorValue();
+            return numOr(assumptions.basePDR, 8) * productivityFactorValue();
         }
 
         function renderAssumptionControls() {
@@ -1693,8 +1693,9 @@
             const techSel = document.getElementById('input-tech-factor');
             if (techSel) {
                 const entries = Object.entries(wbsData.techStackFactors || {});
-                techSel.innerHTML = '<option value="">None (1.0×)</option>' + entries.map(([key, d]) =>
-                    `<option value="${key}">${d.label || key} (${numOr(d.factor, 1)}×)</option>`
+                // No multiplier shown — tech stack is documentation, not a factor.
+                techSel.innerHTML = '<option value="">Not specified</option>' + entries.map(([key, d]) =>
+                    `<option value="${key}">${d.label || key}</option>`
                 ).join('');
                 techSel.value = assumptions.techFactorKey || '';
             }
@@ -1722,12 +1723,9 @@
 
         function renderPDRChain() {
             const base = numOr(assumptions.basePDR, 8);
-            const tech = techFactorValue();
-            const techLabel = wbsData.techStackFactors?.[assumptions.techFactorKey]?.label;
             const effective = getEffectivePDR();
 
-            const parts = [`${base} (base)`];
-            if (assumptions.techFactorKey) parts.push(`${tech} (${techLabel || assumptions.techFactorKey})`);
+            const parts = [`${base} (nominal)`];
             (assumptions.activeProductivityKeys || []).forEach(key => {
                 const d = wbsData.productivityFactors?.[key];
                 parts.push(`${numOr(d?.factor, 1)} (${d?.label || key})`);

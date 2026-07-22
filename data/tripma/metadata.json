@@ -331,10 +331,10 @@
       }
     },
     "productivityFactors": {
-      "aiCopilot": {
+      "aiAssisted": {
         "factor": 0.65,
-        "label": "AI Copilot Assisted",
-        "description": "35% reduction with GitHub Copilot/Claude"
+        "label": "AI Agent-Assisted",
+        "description": "Human-led build with an AI agent assisting (code completion, drafting, review support). Vendor-neutral."
       },
       "experiencedTeam": {
         "factor": 0.8,
