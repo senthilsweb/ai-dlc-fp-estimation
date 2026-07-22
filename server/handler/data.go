@@ -210,10 +210,8 @@ func buildAppData(dataFS fs.FS, appID string) (map[string]interface{}, error) {
 		"techStackFactors":     firstNonNil(effortConfig["techStackFactors"], meta["techStackFactors"]),
 		"productivityFactors":  firstNonNil(effortConfig["productivityFactors"], meta["productivityFactors"]),
 		"sdlcPhases":           firstNonNil(effortConfig["sdlcPhases"], []interface{}{}),
-		"fpWeights":            firstNonNil(fpConfig["fpWeights"], meta["fpWeights"]),
-		"complexityGuidelines": firstNonNil(fpConfig["complexityGuidelines"], meta["complexityGuidelines"]),
-		"gscDefinitions":       firstNonNil(fpConfig["gscDefinitions"], []interface{}{}),
-		"gscRatingGuide":       firstNonNil(fpConfig["gscRatingGuide"], map[string]interface{}{}),
+		"fpWeights":      firstNonNil(fpConfig["fpWeights"], meta["fpWeights"]),
+		"gscDefinitions": firstNonNil(fpConfig["gscDefinitions"], []interface{}{}),
 		// VAF = vafBase + (vafIncrement x TDI). The IFPUG standard is
 		// 0.65 + 0.01 x TDI, which bounds the adjustment to +/-35%. Exposed as
 		// config so nothing is hardcoded, but changing these means the result is

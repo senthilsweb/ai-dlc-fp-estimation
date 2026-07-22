@@ -185,26 +185,6 @@
         ]
       }
     },
-    "complexityGuidelines": {
-      "L": {
-        "label": "Low",
-        "dataElements": "1-5 DETs",
-        "recordTypes": "0-1 RETs/FTRs",
-        "description": "Simple function with minimal data elements"
-      },
-      "A": {
-        "label": "Average",
-        "dataElements": "6-19 DETs",
-        "recordTypes": "2 RETs/FTRs",
-        "description": "Moderate complexity with multiple data elements"
-      },
-      "H": {
-        "label": "High",
-        "dataElements": "20+ DETs",
-        "recordTypes": "3+ RETs/FTRs",
-        "description": "Complex function with many data elements and relationships"
-      }
-    },
     "gscDefinitions": [
       {
         "id": 1,
@@ -291,41 +271,28 @@
         "default": 4
       }
     ],
-    "gscRatingGuide": {
-      "0": "Not present / No influence",
-      "1": "Incidental influence",
-      "2": "Moderate influence",
-      "3": "Average influence",
-      "4": "Significant influence",
-      "5": "Strong influence throughout"
-    },
     "vafBase": 0.65,
     "vafIncrement": 0.01
   },
   "effortConfig": {
     "techStackFactors": {
       "web": {
-        "factor": 1.0,
         "label": "Web Application (Next.js)",
         "icon": "mdi:web"
       },
       "mobile": {
-        "factor": 1.2,
         "label": "Mobile/PWA",
         "icon": "mdi:cellphone"
       },
       "api": {
-        "factor": 1.1,
         "label": "API Integration",
         "icon": "mdi:api"
       },
       "payments": {
-        "factor": 1.3,
         "label": "Payment Processing",
         "icon": "mdi:credit-card"
       },
       "admin": {
-        "factor": 1.0,
         "label": "Admin Portal",
         "icon": "mdi:shield-account"
       }
@@ -485,54 +452,6 @@
       "fullName": "Online Travel Agency",
       "definition": "A web-based marketplace that allows consumers to research and book travel products and services directly.",
       "formula": "N/A"
-    },
-    {
-      "term": "UFP",
-      "fullName": "Unadjusted Function Points",
-      "definition": "The raw count of function points before applying any adjustment factors.",
-      "formula": "UFP = \u03a3(EI\u00d7w) + \u03a3(EO\u00d7w) + \u03a3(EQ\u00d7w) + \u03a3(ILF\u00d7w) + \u03a3(EIF\u00d7w)"
-    },
-    {
-      "term": "AFP",
-      "fullName": "Adjusted Function Points",
-      "definition": "Function points after applying Value Adjustment Factor based on 14 General System Characteristics.",
-      "formula": "AFP = UFP \u00d7 VAF, where VAF = 0.65 + (0.01 \u00d7 TDI)"
-    },
-    {
-      "term": "VAF",
-      "fullName": "Value Adjustment Factor",
-      "definition": "A multiplier (0.65 to 1.35) derived from 14 General System Characteristics.",
-      "formula": "VAF = 0.65 + (0.01 \u00d7 \u03a3 GSC ratings)"
-    },
-    {
-      "term": "EI",
-      "fullName": "External Input",
-      "definition": "An elementary process that processes data entering from outside the application boundary.",
-      "formula": "Complexity based on DETs and FTRs"
-    },
-    {
-      "term": "EO",
-      "fullName": "External Output",
-      "definition": "An elementary process that generates data sent outside the application boundary with processing logic.",
-      "formula": "Complexity based on DETs and FTRs"
-    },
-    {
-      "term": "EQ",
-      "fullName": "External Inquiry",
-      "definition": "An elementary process that retrieves data without derived calculations.",
-      "formula": "Complexity based on DETs and FTRs"
-    },
-    {
-      "term": "ILF",
-      "fullName": "Internal Logical File",
-      "definition": "A user-identifiable group of logically related data maintained within the application.",
-      "formula": "Complexity based on DETs and RETs"
-    },
-    {
-      "term": "EIF",
-      "fullName": "External Interface File",
-      "definition": "A user-identifiable group of logically related data referenced but not maintained by the application.",
-      "formula": "Complexity based on DETs and RETs"
     }
   ]
 }

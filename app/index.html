@@ -755,9 +755,24 @@
                     <div class="p-4 border-b border-gray-200">
                         <h2 class="font-semibold text-gray-900 flex items-center gap-2">
                             <iconify-icon icon="mdi:book-open-page-variant" class="text-blue-600"></iconify-icon>
-                            Function Point Analysis Glossary
+                            Glossary
                         </h2>
-                        <p class="text-sm text-gray-500 mt-1">IFPUG standard terms and definitions for Function Point Analysis</p>
+                        <p class="text-sm text-gray-500 mt-1">IFPUG Function Point terms, the estimation model, and AI-DLC vocabulary.</p>
+                    </div>
+                    <div class="px-4 py-3 bg-blue-50 border-b border-blue-100 text-sm text-blue-900">
+                        <div class="flex items-start gap-2">
+                            <iconify-icon icon="mdi:robot-outline" class="text-blue-600 mt-0.5 flex-shrink-0"></iconify-icon>
+                            <div>
+                                <strong>What this tool is for.</strong>
+                                Estimating software delivery across the spectrum from human-led, through AI-assisted, to
+                                <strong>agent-led</strong> — where an AI agent does the bulk of the work and the human steers, reviews,
+                                decides and approves. <strong>AI-DLC</strong> is the reference methodology it is modelled on.
+                                Function Points remain the invariant measure — a function’s size does not change because an agent wrote it —
+                                which is precisely what makes agent-led and human-led delivery comparable. The delivery <em>rate</em> is what
+                                changes, and that is expressed through the configurable knobs in Effort &amp; Cost.
+                                <span class="block mt-1 text-blue-700">Published estimation benchmarks all assume a human writes the code; no calibrated model exists for agent-led delivery yet. Treat outputs as tunable projections until calibrated against your own actuals.</span>
+                            </div>
+                        </div>
                     </div>
                     <div id="glossary-content" class="divide-y divide-gray-100"></div>
                 </div>
@@ -851,14 +866,17 @@
             </div>
         </main>
 
-        <!-- Sticky Footer -->
+        <!-- Sticky Footer — product branding only. Deliberately carries no project
+             or dataset identity: the same binary serves many datasets. -->
         <footer class="bg-gray-800 text-white py-4 mt-auto">
             <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
                 <div class="flex items-center gap-2 text-sm">
-                    <iconify-icon icon="mdi:chart-gantt" class="text-blue-400"></iconify-icon>
-                    <span id="footer-title">FP Estimator</span>
+                    <iconify-icon icon="mdi:function-variant" class="text-blue-400"></iconify-icon>
+                    <span class="font-semibold" id="footer-title">FP Estimator</span>
                     <span class="text-gray-500">|</span>
-                    <span id="footer-version" class="text-gray-400">v1.0.0</span>
+                    <span class="text-gray-400 hidden sm:inline" id="footer-tagline">Function Point estimation for AI-assisted &amp; agent-led delivery</span>
+                    <span class="text-gray-500 hidden sm:inline">|</span>
+                    <span id="footer-version" class="text-gray-400">v0.1.0</span>
                 </div>
                 <div class="text-sm text-gray-400">
                     Generated on <span id="generated-date">-</span>
@@ -868,6 +886,12 @@
     </div>
 
     <script>
+        // Product identity for the binary itself — distinct from any dataset it
+        // serves. The footer uses these; the header uses the dataset's branding.
+        const TOOL_NAME = 'FP Estimator';
+        const TOOL_TAGLINE = 'Function Point estimation for AI-assisted & agent-led delivery';
+        const TOOL_VERSION = '0.1.0';
+
         let wbsData = null;
         let expandedProducts = new Set();
         let expandedFeatures = new Set();
@@ -909,11 +933,31 @@
             }
         });
 
+        function applyToolBranding() {
+            const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+            set('footer-title', TOOL_NAME);
+            set('footer-tagline', TOOL_TAGLINE);
+            set('footer-version', 'v' + TOOL_VERSION);
+            document.title = TOOL_NAME;
+        }
+
         function initializeUI() {
+            applyToolBranding();
             const brandPrefix = wbsData.metadata?.brandPrefix || 'FP';
             document.getElementById('mainTitle').textContent = brandPrefix + ' Function Point Calculator';
-            document.getElementById('footer-title').textContent = brandPrefix + ' FP Calculator';
-            document.getElementById('footer-version').textContent = 'v' + (wbsData.metadata?.version || '1.0.0');
+
+            // Header icon reflects the project being estimated, from the dataset.
+            const appIcon = document.getElementById('appIcon');
+            const appIconBadge = document.getElementById('appIconBadge');
+            if (appIcon && wbsData.projectSummary?.logo) {
+                appIcon.setAttribute('icon', wbsData.projectSummary.logo);
+            }
+            if (appIconBadge && wbsData.projectSummary?.logoColor) {
+                appIconBadge.style.backgroundColor = wbsData.projectSummary.logoColor;
+            }
+            // Footer is product branding, not project branding — it must not take
+            // the dataset's name or version. TOOL_NAME/TOOL_VERSION describe the
+            // binary and are the one place a literal is correct here.
             document.getElementById('generated-date').textContent = wbsData.metadata?.generatedDate || new Date().toISOString().split('T')[0];
             applyStatusLabels();
 
@@ -1427,11 +1471,6 @@
             localStorage.setItem(nsKey('included-capabilities'), JSON.stringify(includedCapabilities));
             renderWBSTree();
             renderStats(); // Update counts
-        }
-
-        function resetInclusions() {
-            // Reset all to included
-            setAllInclusions(true);
         }
 
         function setAllInclusions(included) {
@@ -2322,32 +2361,68 @@
             container.innerHTML = html;
         }
 
+        // Method vocabulary shipped with the tool. These are universal to the
+        // estimation model, not to any one project, so they live here rather than
+        // being duplicated into every dataset (same rationale as the IFPUG
+        // reference tables on the FP Guide tab). Datasets add project terms on top.
+        const CORE_GLOSSARY = [
+            { term: 'FP', fullName: 'Function Point', definition: 'A unit of functional size measured from the user’s perspective, independent of technology, team, or who writes the code — human or AI agent. That independence is why it is the anchor of this tool: it lets agent-led and human-led delivery be compared on the same scale.' },
+            { term: 'UFP', fullName: 'Unadjusted Function Points', definition: 'The raw functional size: every included item’s FP weight summed, before any adjustment.', formula: 'UFP = Σ (fpWeights[type][complexity])' },
+            { term: 'EI', fullName: 'External Input', definition: 'Data or control information entering the system from outside, maintaining an internal file — e.g. a create/update form, an inbound API write.' },
+            { term: 'EO', fullName: 'External Output', definition: 'Data leaving the system that involves derived information — calculation, aggregation or transformation — e.g. a computed report or a scored result.' },
+            { term: 'EQ', fullName: 'External Inquiry', definition: 'A request-and-retrieve with no derived data and no file update — a straightforward lookup or listing.' },
+            { term: 'ILF', fullName: 'Internal Logical File', definition: 'A user-identifiable group of logically related data maintained inside the system boundary — e.g. an entity the application owns and writes.' },
+            { term: 'EIF', fullName: 'External Interface File', definition: 'A user-identifiable group of related data referenced by the system but maintained by another application — read, never written.' },
+            { term: 'GSC', fullName: 'General System Characteristics', definition: 'The 14 system-wide factors (performance, reusability, distributed processing…) each rated 0–5 to reflect qualities the raw function count does not capture.' },
+            { term: 'TDI', fullName: 'Total Degree of Influence', definition: 'The sum of the 14 GSC ratings; ranges 0–70.', formula: 'TDI = Σ (GSC ratings)' },
+            { term: 'VAF', fullName: 'Value Adjustment Factor', definition: 'Scales UFP by system characteristics. With the IFPUG constants it spans 0.65–1.35, i.e. ±35%. Both constants are configurable under Effort & Cost → Advanced, but changing them makes the result no longer IFPUG-conformant.', formula: 'VAF = vafBase + (vafIncrement × TDI)' },
+            { term: 'AFP', fullName: 'Adjusted Function Points', definition: 'Functional size after the VAF adjustment. This is what effort is calculated from.', formula: 'AFP = UFP × VAF' },
+            { term: 'PDR', fullName: 'Project Delivery Rate', definition: 'Hours needed to deliver one Function Point — the bridge from size to effort. ISBSG publishes PDR benchmarks by language and platform, which is what makes an FP-based estimate externally defensible.', formula: 'effort (hours) = AFP × PDR' },
+            { term: 'Nominal PDR', fullName: 'Nominal Project Delivery Rate', definition: 'The delivery rate BEFORE any AI adjustment — the human baseline for the stack (conventionally ~8 h/FP for enterprise work). It must not be pre-discounted for AI: the productivity factors carry that speedup. Setting a discounted nominal rate AND ticking an AI factor counts the same gain twice. Mirrors COCOMO’s “nominal effort” before effort multipliers.' },
+            { term: 'Effective PDR', fullName: 'Effective Project Delivery Rate', definition: 'The rate actually used, after composing the productivity factors onto the nominal rate. Composition keeps each assumption separately visible and separately calibratable — a single blended figure cannot tell you which assumption was wrong when actuals arrive.', formula: 'effective PDR = nominal PDR × Π(active productivity factors)' },
+            { term: 'Productivity Factor', fullName: 'Productivity Factor', definition: 'A multiplier on the nominal rate. Below 1 speeds delivery up, above 1 slows it down; ticked factors compound. This is where AI speedup belongs — e.g. AI Agent-Assisted for a human-led build with agent support, versus agent-led delivery where the agent does the bulk and the human steers, reviews and approves.' },
+            { term: 'AI-DLC', fullName: 'AI Development Life Cycle', definition: 'The reference methodology this tool is built for: an agent performs the bulk of the work while the human acts as steerer, reviewer, decision maker and approver. No calibrated industry estimation model exists for this mode of working — every published benchmark assumes a human writes the code — which is the gap this tool addresses.' },
+            { term: 'Intent', fullName: 'Intent (AI-DLC)', definition: 'The top level of an AI-DLC breakdown: a high-level goal stated in plain language, from which everything else grows. Maps to the first level of this tool’s hierarchy.' },
+            { term: 'Bolt', fullName: 'Bolt (AI-DLC)', definition: 'A short burst of construction — hours or days rather than the weeks of a Scrum sprint, which it replaces. The estimable work packet: a bolt is fully deployable once done. Maps to the second level of this tool’s hierarchy.' },
+            { term: 'Unit of Work', fullName: 'Unit of Work / Task (AI-DLC)', definition: 'One small, self-contained thing to build — replaces the Agile “story”. Eval design, test-data preparation and rubric authoring are units of work like any other, sized the same way, not a separate category of effort. Maps to the third level of this tool’s hierarchy.' },
+            { term: 'Eval', fullName: 'Evaluation', definition: 'A graded check of one required behaviour, written against a rubric before the code exists. Because evals are specified up front they are genuine delivery work, and they are estimated as units of work inside their bolt.' }
+        ];
+
         function renderGlossary() {
             const container = document.getElementById('glossary-content');
-            const glossary = wbsData.glossary;
-            
-            if (!glossary || glossary.length === 0) {
-                container.innerHTML = '<div class="p-8 text-center text-gray-500">No glossary terms available</div>';
-                return;
+            const datasetTerms = Array.isArray(wbsData.glossary) ? wbsData.glossary : [];
+
+            let html = sectionHeading('Method & Estimation', 'Shipped with the tool — the same for every project.');
+            html += CORE_GLOSSARY.map(glossaryRow).join('');
+
+            if (datasetTerms.length > 0) {
+                html += sectionHeading('Project Terms', 'Defined by the active dataset.');
+                html += datasetTerms.map(glossaryRow).join('');
             }
-
-            let html = '';
-            glossary.forEach(item => {
-                html += '<div class="p-4 hover:bg-gray-50">';
-                html += '<div class="flex items-start gap-4">';
-                html += '<div class="min-w-[80px]"><span class="font-mono font-bold text-blue-600 text-lg">' + item.term + '</span></div>';
-                html += '<div class="flex-1">';
-                html += '<div class="font-medium text-gray-900 mb-1">' + item.fullName + '</div>';
-                html += '<p class="text-gray-600 text-sm mb-2">' + item.definition + '</p>';
-                if (item.formula && !item.formula.startsWith('N/A')) {
-                    html += '<div class="mt-2 bg-gray-100 px-3 py-2 rounded font-mono text-sm text-gray-700">';
-                    html += '<iconify-icon icon="mdi:function" class="text-purple-600 mr-1"></iconify-icon>' + item.formula + '</div>';
-                }
-                html += '</div></div></div>';
-            });
-
             container.innerHTML = html;
         }
+
+        function sectionHeading(title, subtitle) {
+            return '<div class="px-4 py-3 bg-gray-100 border-y border-gray-200">'
+                 + '<div class="font-semibold text-gray-800 text-sm">' + title + '</div>'
+                 + '<div class="text-xs text-gray-500">' + subtitle + '</div></div>';
+        }
+
+        function glossaryRow(item) {
+            let html = '<div class="p-4 hover:bg-gray-50">';
+            html += '<div class="flex items-start gap-4">';
+            html += '<div class="min-w-[110px]"><span class="font-mono font-bold text-blue-600 text-sm">' + (item.term || '') + '</span></div>';
+            html += '<div class="flex-1">';
+            html += '<div class="font-medium text-gray-900 mb-1">' + (item.fullName || '') + '</div>';
+            html += '<p class="text-gray-600 text-sm mb-2">' + (item.definition || '') + '</p>';
+            if (item.formula && !String(item.formula).startsWith('N/A')) {
+                html += '<div class="mt-2 bg-gray-100 px-3 py-2 rounded font-mono text-sm text-gray-700">';
+                html += '<iconify-icon icon="mdi:function" class="text-purple-600 mr-1"></iconify-icon>' + item.formula + '</div>';
+            }
+            html += '</div></div></div>';
+            return html;
+        }
+
 
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
