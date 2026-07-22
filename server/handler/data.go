@@ -179,18 +179,26 @@ func buildAppData(dataFS fs.FS, appID string) (map[string]interface{}, error) {
 		"levels":          firstNonNil(projectConfig["levels"], meta["levels"]),
 	}
 
-	var cfgDefaultRate, cfgCurrency, cfgHoursPerDay, cfgDaysPerMonth interface{}
+	var cfgDefaultRate, cfgCurrency, cfgHoursPerDay, cfgDaysPerMonth, cfgDefaultPDR interface{}
 	if cfgBlock != nil {
 		cfgDefaultRate = cfgBlock["defaultHourlyRate"]
 		cfgCurrency = cfgBlock["currency"]
 		cfgHoursPerDay = cfgBlock["hoursPerDay"]
 		cfgDaysPerMonth = cfgBlock["daysPerMonth"]
+		cfgDefaultPDR = cfgBlock["defaultPDR"]
 	}
 	config := map[string]interface{}{
 		"defaultHourlyRate": firstNonNil(projectConfig["defaultHourlyRate"], cfgDefaultRate, 75.0),
 		"currency":          firstNonNil(projectConfig["currency"], cfgCurrency, "USD"),
 		"hoursPerDay":       firstNonNil(projectConfig["hoursPerDay"], cfgHoursPerDay, 8.0),
 		"daysPerMonth":      firstNonNil(projectConfig["daysPerMonth"], cfgDaysPerMonth, 20.0),
+		// Base hours per Function Point — the unadjusted human baseline for the
+		// stack. Tech-stack and productivity factors compose on top of it in the
+		// app (effective PDR = base x tech x productivity), so this must NOT
+		// already have an AI discount baked in. 8.0 is the conventional
+		// human-driven default. Previously this was read by the app but never
+		// passed through here, so any dataset value was silently discarded.
+		"defaultPDR": firstNonNil(projectConfig["defaultPDR"], cfgDefaultPDR, 8.0),
 	}
 
 	result := map[string]interface{}{
@@ -206,6 +214,12 @@ func buildAppData(dataFS fs.FS, appID string) (map[string]interface{}, error) {
 		"complexityGuidelines": firstNonNil(fpConfig["complexityGuidelines"], meta["complexityGuidelines"]),
 		"gscDefinitions":       firstNonNil(fpConfig["gscDefinitions"], []interface{}{}),
 		"gscRatingGuide":       firstNonNil(fpConfig["gscRatingGuide"], map[string]interface{}{}),
+		// VAF = vafBase + (vafIncrement x TDI). The IFPUG standard is
+		// 0.65 + 0.01 x TDI, which bounds the adjustment to +/-35%. Exposed as
+		// config so nothing is hardcoded, but changing these means the result is
+		// no longer IFPUG-conformant — see docs/ai-dlc-estimation-model.md.
+		"vafBase":      firstNonNil(fpConfig["vafBase"], 0.65),
+		"vafIncrement": firstNonNil(fpConfig["vafIncrement"], 0.01),
 		"glossary":             meta["glossary"],
 		"products":             products,
 		"summary": map[string]interface{}{

@@ -83,7 +83,8 @@
         "mainProductName": { "type": "string", "description": "Optional, informational (not directly rendered)." },
         "brandPrefix": { "type": "string", "description": "Optional but strongly recommended — drives the page title, footer text, and Excel/PDF export filename prefix. Falls back to 'FP'." },
         "organization": { "type": "string", "description": "Optional, informational only." },
-        "defaultHourlyRate": { "type": "number", "description": "Optional. Falls back to 75." },
+        "defaultHourlyRate": { "type": "number", "description": "Optional. Falls back to 75. Seeds the Rate/hr input, which the user can then override live." },
+        "defaultPDR": { "type": "number", "exclusiveMinimum": 0, "description": "Optional. Base hours per Function Point — the UNADJUSTED baseline for the stack (conventionally ~8 for human-driven enterprise work). Falls back to 8. Must NOT already include an AI discount: the app composes effective PDR = defaultPDR x techStackFactor x product(active productivityFactors), so baking a discount in here would double-count. Seeds a live input in the Effort & Cost tab. (Before 2026-07-22 this field was read by the app but dropped by the server, so any value set here was silently ignored.)" },
         "currency": { "type": "string", "description": "Optional. Falls back to 'USD'. Not currently rendered as a symbol — informational." },
         "hoursPerDay": { "type": "number", "description": "Optional. Falls back to 8." },
         "daysPerMonth": { "type": "number", "description": "Optional. Falls back to 20." },
@@ -124,7 +125,9 @@
             }
           }
         },
-        "gscRatingGuide": { "type": "object", "description": "Optional, informational." }
+        "gscRatingGuide": { "type": "object", "description": "Optional, informational." },
+        "vafBase": { "type": "number", "description": "Optional. Base term of the Value Adjustment Factor formula: VAF = vafBase + (vafIncrement x TDI). Falls back to the IFPUG standard 0.65. Changing it means results are no longer IFPUG-conformant. Exposed as a live input under Effort & Cost > Advanced." },
+        "vafIncrement": { "type": "number", "description": "Optional. Per-TDI-point term of the VAF formula. Falls back to the IFPUG standard 0.01, which bounds adjustment to +/-35% across the 14 GSC factors." }
       }
     },
 
@@ -132,8 +135,8 @@
       "type": "object",
       "description": "Optional in full.",
       "properties": {
-        "techStackFactors": { "type": "object", "description": "Optional, informational — shown on the Tech Stack tab." },
-        "productivityFactors": { "type": "object", "description": "Optional, informational." },
+        "techStackFactors": { "type": "object", "description": "Optional. Map of {key: {label, factor, icon}}. Populates the Technology Stack dropdown in Effort & Cost; the SELECTED entry's `factor` multiplies into effective PDR (single-select — one dominant stack per estimate). Also shown on the Tech Stack tab. Omit or leave empty and the multiplier is 1.0. (Before 2026-07-22 these were rendered with an 'x' badge but never multiplied anything.)" },
+        "productivityFactors": { "type": "object", "description": "Optional. Map of {key: {label, factor, description}}. Rendered as checkboxes in Effort & Cost; EVERY checked entry's `factor` multiplies into effective PDR (multi-select, they compound). Values below 1 reduce effort, above 1 increase it. None are active by default — the user opts in. (Before 2026-07-22 these were displayed but never applied.)" },
         "sdlcPhases": {
           "type": "array",
           "description": "Optional. If omitted or null, the app falls back to its own built-in SDLC phase breakdown (a hardcoded default list in app/index.html) rather than erroring.",

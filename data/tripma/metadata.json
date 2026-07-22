@@ -81,6 +81,7 @@
     "brandPrefix": "TRIPMA",
     "organization": "Figma Product Education",
     "defaultHourlyRate": 75,
+    "defaultPDR": 8,
     "currency": "USD",
     "hoursPerDay": 8,
     "daysPerMonth": 20,
@@ -297,7 +298,9 @@
       "3": "Average influence",
       "4": "Significant influence",
       "5": "Strong influence throughout"
-    }
+    },
+    "vafBase": 0.65,
+    "vafIncrement": 0.01
   },
   "effortConfig": {
     "techStackFactors": {

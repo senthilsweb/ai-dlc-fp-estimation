@@ -45,7 +45,34 @@ That is roughly a **32× spread**, and it is the honest centre of the value stor
 
 These two figures are the owner's working starting points. They are **not** derived from measured data yet — see [Calibration](#8-calibration-how-this-stops-being-guesswork).
 
-**Implementation note (2026-07-22):** `app/index.html` already reads `wbsData.config.defaultPDR` and defaults to `8` — matching the human-driven Java figure above. But no dataset defines it, and `server/handler/data.go` does not pass it through its config block, so a dataset setting `defaultPDR: 0.25` would be **silently discarded** and fall back to 8. This must be fixed before the model works at all. It is the third field in this codebase defined-but-ignored, after `gscDefinitions` (fixed, ADR-0007) and `levels` (outstanding).
+### How the rate is composed (implemented 2026-07-22)
+
+PDR is **not** set directly to an AI-adjusted number. It composes, so each discount stays separately visible and separately calibratable:
+
+```
+effective PDR = basePDR × techStackFactor × Π(active productivity factors)
+hours         = AFP × effective PDR
+cost          = hours × rate
+```
+
+`basePDR` is therefore the **unadjusted human baseline** for the stack and must not have an AI discount baked into it — that would double-count against the productivity factors.
+
+The Effort & Cost tab renders the full chain so any number is auditable, e.g.:
+
+```
+0.25 (base) × 1 (Admin Portal) × 0.65 (AI Copilot Assisted) × 0.7 (Component Reuse) = 0.114 h/FP
+```
+
+Why composition rather than a single blended PDR: when actuals arrive, a blended figure can't tell you *which* term was wrong. Composition can. That matters directly for §8.
+
+**All knobs are live inputs**, seeded from the dataset, persisted per dataset in `localStorage`, with a reset-to-dataset-defaults control: base PDR, hours/day, days/month, tech stack (single-select — one dominant stack), productivity factors (multi-select, they compound), rate/hr, and the VAF constants. Per point 3 of the owner's direction, granularity is the estimator's choice: one config applies to every bolt in a dataset, and per-bolt assumptions are achieved by splitting into separate datasets and switching with `?app=` — no per-bolt override machinery.
+
+**What was broken before this (2026-07-22):** three separate defects meant almost none of this worked.
+- `projectConfig.defaultPDR` was read by the app but never passed through by `server/handler/data.go`, so any dataset value was silently discarded and every estimate used `8`.
+- `productivityFactors` and `techStackFactors` were rendered with bold `0.65×`-style badges but **never multiplied into anything** — `renderProductivityFactors()` and `renderTechFactors()` only built HTML. They were pictures of dials.
+- The VAF constants, hours/day, days/month and a literal `160` "working hours/month" were hardcoded in the markup and math.
+
+Of the four things that should tune an AI-DLC estimate — PDR, productivity factors, tech factors, GSC — only GSC actually worked. This is the same defined-but-ignored bug class as `gscDefinitions` (ADR-0007) and `levels` (still outstanding).
 
 ## 4. Bolt complexity is rated, never inferred from task count
 

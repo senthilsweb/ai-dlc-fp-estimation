@@ -434,29 +434,87 @@
                         </div>
                     </div>
 
-                    <!-- Estimation Assumptions -->
+                    <!-- Estimation Assumptions — every value here is a live input,
+                         seeded from the active dataset. Nothing is hardcoded. -->
                     <div class="bg-white rounded-xl border border-gray-200 p-6">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                            <iconify-icon icon="mdi:information-outline" class="text-purple-600"></iconify-icon>
-                            Estimation Assumptions
-                        </h3>
-                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div class="flex items-center justify-between flex-wrap gap-2 mb-1">
+                            <h3 class="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                                <iconify-icon icon="mdi:tune-vertical" class="text-purple-600"></iconify-icon>
+                                Estimation Assumptions
+                            </h3>
+                            <button onclick="resetAssumptions()" class="text-sm px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center gap-1">
+                                <iconify-icon icon="mdi:restore"></iconify-icon>
+                                Reset to dataset defaults
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-5">Every assumption below is an input. Changes apply immediately and are saved per dataset.</p>
+
+                        <!-- Effective PDR composition -->
+                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-5">
+                            <div class="flex items-baseline justify-between flex-wrap gap-2 mb-3">
+                                <div class="font-semibold text-purple-900">Effective Delivery Rate</div>
+                                <div class="text-xs text-purple-700">base × tech stack × productivity factors</div>
+                            </div>
+                            <div class="flex items-baseline gap-2 flex-wrap mb-2">
+                                <span class="text-3xl font-bold text-purple-700" id="effective-pdr">8</span>
+                                <span class="text-sm text-purple-600">hours per Function Point</span>
+                            </div>
+                            <div class="text-xs font-mono text-purple-800 bg-white/70 rounded px-3 py-2 overflow-x-auto" id="pdr-chain">—</div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-4 text-sm mb-5">
                             <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="font-semibold text-gray-700 mb-2">Productivity Delivery Rate</div>
-                                <div class="text-2xl font-bold text-purple-600" id="assumption-pdr">8</div>
-                                <div class="text-gray-500 text-xs">Hours per Function Point</div>
+                                <label class="block font-semibold text-gray-700 mb-2" for="input-base-pdr">Base PDR</label>
+                                <input type="number" id="input-base-pdr" min="0.01" step="0.05"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-semibold text-purple-700">
+                                <div class="text-gray-500 text-xs mt-1">Unadjusted hours per FP (human baseline)</div>
                             </div>
                             <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="font-semibold text-gray-700 mb-2">Hourly Rate</div>
-                                <div class="text-2xl font-bold text-green-600" id="assumption-rate">$50</div>
-                                <div class="text-gray-500 text-xs">Blended resource rate</div>
+                                <label class="block font-semibold text-gray-700 mb-2" for="input-hours-day">Hours / Day</label>
+                                <input type="number" id="input-hours-day" min="0.5" step="0.5"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold text-blue-700">
+                                <div class="text-gray-500 text-xs mt-1">Used for the duration figure</div>
                             </div>
                             <div class="bg-gray-50 rounded-lg p-4">
-                                <div class="font-semibold text-gray-700 mb-2">Working Hours/Month</div>
-                                <div class="text-2xl font-bold text-blue-600">160</div>
-                                <div class="text-gray-500 text-xs">Standard 8hr × 20 days</div>
+                                <label class="block font-semibold text-gray-700 mb-2" for="input-days-month">Days / Month</label>
+                                <input type="number" id="input-days-month" min="1" step="1"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold text-blue-700">
+                                <div class="text-gray-500 text-xs mt-1"><span id="hours-per-month">160</span> hours/month</div>
                             </div>
                         </div>
+
+                        <div class="grid md:grid-cols-2 gap-4 mb-5">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <label class="block font-semibold text-gray-700 mb-2 text-sm" for="input-tech-factor">Technology Stack</label>
+                                <select id="input-tech-factor" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 text-sm"></select>
+                                <div class="text-gray-500 text-xs mt-1">One dominant stack multiplier for this estimate</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="font-semibold text-gray-700 mb-2 text-sm">Productivity Factors</div>
+                                <div id="input-productivity-factors" class="space-y-1.5 max-h-44 overflow-y-auto"></div>
+                                <div class="text-gray-500 text-xs mt-2">Selected factors multiply together</div>
+                            </div>
+                        </div>
+
+                        <details class="bg-gray-50 rounded-lg p-4">
+                            <summary class="font-semibold text-gray-700 text-sm cursor-pointer">Advanced — Value Adjustment Factor formula</summary>
+                            <div class="grid md:grid-cols-2 gap-4 mt-4 text-sm">
+                                <div>
+                                    <label class="block text-gray-600 mb-1 text-xs" for="input-vaf-base">VAF base</label>
+                                    <input type="number" id="input-vaf-base" step="0.01"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-orange-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-600 mb-1 text-xs" for="input-vaf-increment">VAF increment per TDI point</label>
+                                    <input type="number" id="input-vaf-increment" step="0.001"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-orange-500">
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-3">
+                                Current formula: <span class="font-mono text-orange-700" id="vaf-formula-display">VAF = 0.65 + (0.01 × TDI)</span>.
+                                IFPUG standard is 0.65 / 0.01, which bounds adjustment to ±35%. Changing these means the result is no longer IFPUG-conformant.
+                            </div>
+                        </details>
                     </div>
                 </div>
             </div>
@@ -733,7 +791,7 @@
                             <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
                                 <div class="text-sm text-purple-600 mb-1">Value Adjustment Factor</div>
                                 <div id="gsc-vaf" class="text-2xl font-bold text-purple-700">1.00</div>
-                                <div class="text-xs text-purple-500">VAF = 0.65 + (0.01 × TDI)</div>
+                                <div class="text-xs text-purple-500" id="vaf-formula-gsc">VAF = 0.65 + (0.01 × TDI)</div>
                             </div>
                             <div class="bg-green-50 rounded-lg p-4 border border-green-200">
                                 <div class="text-sm text-green-600 mb-1">Unadjusted FP (UFP)</div>
@@ -862,6 +920,10 @@
 
             document.getElementById('hourlyRate').addEventListener('change', updateStats);
             document.getElementById('hourlyRate').addEventListener('input', updateStats);
+
+            // Estimation knobs must be initialized before anything computes effort.
+            initializeAssumptions();
+            wireAssumptionInputs();
 
             // Initialize inclusion state for all products and features
             initializeInclusionState();
@@ -1505,8 +1567,9 @@
             // Calculate TDI (Total Degree of Influence)
             const tdi = Object.values(gscValues).reduce((sum, val) => sum + val, 0);
             
-            // Calculate VAF (Value Adjustment Factor): 0.65 to 1.35
-            const vaf = 0.65 + (0.01 * tdi);
+            // Calculate VAF (Value Adjustment Factor) from the configured
+            // constants — IFPUG default 0.65 + 0.01 x TDI gives a 0.65–1.35 range.
+            const vaf = numOr(assumptions.vafBase, 0.65) + (numOr(assumptions.vafIncrement, 0.01) * tdi);
             
             // Get UFP from current data (included items only)
             let ufp = 0;
@@ -1547,17 +1610,201 @@
             window.print();
         }
 
-        // Calculate VAF from stored GSC values
+        // ---------------------------------------------------------------
+        // Estimation assumptions — every knob that drives Effort & Cost.
+        //
+        // Seeded from the active dataset, live-editable in the UI, persisted
+        // per dataset. Nothing here may be hardcoded in the math: a literal
+        // that appears in a formula and nowhere in the dataset is a bug.
+        //
+        // Effective PDR composes rather than being set directly:
+        //     effective = basePDR x techFactor x PRODUCT(active productivity factors)
+        // so basePDR stays the unadjusted human baseline and each discount is
+        // visible and separately calibratable. See ADR-0008.
+        // ---------------------------------------------------------------
+        let assumptions = {};
+
+        function datasetAssumptionDefaults() {
+            return {
+                basePDR: numOr(wbsData.config?.defaultPDR, 8),
+                hoursPerDay: numOr(wbsData.config?.hoursPerDay, 8),
+                daysPerMonth: numOr(wbsData.config?.daysPerMonth, 20),
+                vafBase: numOr(wbsData.vafBase, 0.65),
+                vafIncrement: numOr(wbsData.vafIncrement, 0.01),
+                techFactorKey: '',          // '' = no stack multiplier (1.0)
+                activeProductivityKeys: []  // none active by default
+            };
+        }
+
+        function numOr(value, fallback) {
+            const n = parseFloat(value);
+            return Number.isFinite(n) ? n : fallback;
+        }
+
+        function initializeAssumptions() {
+            const defaults = datasetAssumptionDefaults();
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem(nsKey('assumptions')) || '{}');
+            } catch (e) {
+                saved = {};
+            }
+            assumptions = { ...defaults, ...saved };
+            renderAssumptionControls();
+        }
+
+        function saveAssumptions() {
+            localStorage.setItem(nsKey('assumptions'), JSON.stringify(assumptions));
+        }
+
+        function resetAssumptions() {
+            localStorage.removeItem(nsKey('assumptions'));
+            assumptions = datasetAssumptionDefaults();
+            renderAssumptionControls();
+            updateStats();
+        }
+
+        function techFactorValue() {
+            const f = wbsData.techStackFactors?.[assumptions.techFactorKey];
+            return numOr(f?.factor, 1);
+        }
+
+        function productivityFactorValue() {
+            const all = wbsData.productivityFactors || {};
+            return (assumptions.activeProductivityKeys || []).reduce((acc, key) => {
+                return acc * numOr(all[key]?.factor, 1);
+            }, 1);
+        }
+
+        // The single source of truth for hours-per-FP used by every calculation.
+        function getEffectivePDR() {
+            return numOr(assumptions.basePDR, 8) * techFactorValue() * productivityFactorValue();
+        }
+
+        function renderAssumptionControls() {
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+            setVal('input-base-pdr', assumptions.basePDR);
+            setVal('input-hours-day', assumptions.hoursPerDay);
+            setVal('input-days-month', assumptions.daysPerMonth);
+            setVal('input-vaf-base', assumptions.vafBase);
+            setVal('input-vaf-increment', assumptions.vafIncrement);
+
+            // Tech stack select
+            const techSel = document.getElementById('input-tech-factor');
+            if (techSel) {
+                const entries = Object.entries(wbsData.techStackFactors || {});
+                techSel.innerHTML = '<option value="">None (1.0×)</option>' + entries.map(([key, d]) =>
+                    `<option value="${key}">${d.label || key} (${numOr(d.factor, 1)}×)</option>`
+                ).join('');
+                techSel.value = assumptions.techFactorKey || '';
+            }
+
+            // Productivity factor checkboxes
+            const prodBox = document.getElementById('input-productivity-factors');
+            if (prodBox) {
+                const entries = Object.entries(wbsData.productivityFactors || {});
+                prodBox.innerHTML = entries.length === 0
+                    ? '<div class="text-xs text-gray-400 italic">None defined in this dataset.</div>'
+                    : entries.map(([key, d]) => {
+                        const on = (assumptions.activeProductivityKeys || []).includes(key);
+                        const f = numOr(d.factor, 1);
+                        const color = f < 1 ? 'text-green-600' : 'text-orange-600';
+                        return `<label class="flex items-center gap-2 cursor-pointer text-sm">
+                            <input type="checkbox" data-prod-key="${key}" ${on ? 'checked' : ''}
+                                   class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer">
+                            <span class="flex-1 text-gray-700">${d.label || key}</span>
+                            <span class="font-semibold ${color}">${f}×</span>
+                        </label>`;
+                    }).join('');
+            }
+            renderPDRChain();
+        }
+
+        function renderPDRChain() {
+            const base = numOr(assumptions.basePDR, 8);
+            const tech = techFactorValue();
+            const techLabel = wbsData.techStackFactors?.[assumptions.techFactorKey]?.label;
+            const effective = getEffectivePDR();
+
+            const parts = [`${base} (base)`];
+            if (assumptions.techFactorKey) parts.push(`${tech} (${techLabel || assumptions.techFactorKey})`);
+            (assumptions.activeProductivityKeys || []).forEach(key => {
+                const d = wbsData.productivityFactors?.[key];
+                parts.push(`${numOr(d?.factor, 1)} (${d?.label || key})`);
+            });
+
+            const chainEl = document.getElementById('pdr-chain');
+            if (chainEl) {
+                chainEl.textContent = parts.join('  ×  ') + '  =  ' + round3(effective) + ' h/FP';
+            }
+            const effEl = document.getElementById('effective-pdr');
+            if (effEl) effEl.textContent = round3(effective);
+
+            const hpm = document.getElementById('hours-per-month');
+            if (hpm) hpm.textContent = round3(numOr(assumptions.hoursPerDay, 8) * numOr(assumptions.daysPerMonth, 20));
+
+            const formula = `VAF = ${assumptions.vafBase} + (${assumptions.vafIncrement} × TDI)`;
+            const vafF = document.getElementById('vaf-formula-display');
+            if (vafF) vafF.textContent = formula;
+            const vafG = document.getElementById('vaf-formula-gsc');
+            if (vafG) vafG.textContent = formula;
+        }
+
+        function round3(n) {
+            return Math.round(n * 1000) / 1000;
+        }
+
+        function wireAssumptionInputs() {
+            const bind = (id, key) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('input', () => {
+                    assumptions[key] = numOr(el.value, assumptions[key]);
+                    saveAssumptions();
+                    renderPDRChain();
+                    updateStats();
+                });
+            };
+            bind('input-base-pdr', 'basePDR');
+            bind('input-hours-day', 'hoursPerDay');
+            bind('input-days-month', 'daysPerMonth');
+            bind('input-vaf-base', 'vafBase');
+            bind('input-vaf-increment', 'vafIncrement');
+
+            const techSel = document.getElementById('input-tech-factor');
+            if (techSel) techSel.addEventListener('change', () => {
+                assumptions.techFactorKey = techSel.value;
+                saveAssumptions();
+                renderPDRChain();
+                updateStats();
+            });
+
+            const prodBox = document.getElementById('input-productivity-factors');
+            if (prodBox) prodBox.addEventListener('change', (e) => {
+                const key = e.target?.dataset?.prodKey;
+                if (!key) return;
+                const set = new Set(assumptions.activeProductivityKeys || []);
+                e.target.checked ? set.add(key) : set.delete(key);
+                assumptions.activeProductivityKeys = [...set];
+                saveAssumptions();
+                renderPDRChain();
+                updateStats();
+            });
+        }
+
+        // Calculate VAF from stored GSC values, using the dataset's (or the
+        // user's overridden) VAF constants rather than hardcoded IFPUG ones.
         function getVAF() {
+            const base = numOr(assumptions.vafBase, 0.65);
+            const inc = numOr(assumptions.vafIncrement, 0.01);
             const stored = localStorage.getItem(nsKey('gsc-values'));
             if (stored) {
                 const gscValues = JSON.parse(stored);
                 const tdi = Object.values(gscValues).reduce((sum, val) => sum + val, 0);
-                return 0.65 + (0.01 * tdi);
+                return base + (inc * tdi);
             }
-            // Default: use default GSC values
-            const defaultTDI = gscDefinitions.reduce((sum, gsc) => sum + gsc.default, 0);
-            return 0.65 + (0.01 * defaultTDI);
+            const defaultTDI = gscDefinitions.reduce((sum, gsc) => sum + numOr(gsc.default, 0), 0);
+            return base + (inc * defaultTDI);
         }
 
         function renderStats() {
@@ -1635,14 +1882,14 @@
             const vaf = getVAF();
             const afp = Math.round(ufp * vaf);
 
-            // Use AFP for effort calculations (industry standard)
-            const pdr = wbsData.config?.defaultPDR || 8; // hours per FP
+            // Use AFP for effort calculations (industry standard). The rate is the
+            // composed effective PDR — base x tech stack x productivity factors.
+            const pdr = getEffectivePDR();
             const hours = afp * pdr;
-            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 75;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || numOr(wbsData.config?.defaultHourlyRate, 75);
             const cost = hours * hourlyRate;
-            
-            // Calculate months (assuming 8 hours/day, 20 days/month = 160 hours/month)
-            const hoursPerMonth = (wbsData.config?.hoursPerDay || 8) * (wbsData.config?.daysPerMonth || 20);
+
+            const hoursPerMonth = numOr(assumptions.hoursPerDay, 8) * numOr(assumptions.daysPerMonth, 20);
             const months = (hours / hoursPerMonth).toFixed(1);
 
             // Update WBS tab display (simplified - only shows UFP)
@@ -1659,16 +1906,15 @@
             if (effortUfp) effortUfp.textContent = ufp.toLocaleString();
             if (effortAfp) effortAfp.textContent = afp.toLocaleString();
             if (effortVaf) effortVaf.textContent = 'VAF: ' + vaf.toFixed(2);
-            if (effortHours) effortHours.textContent = hours.toLocaleString();
+            // A fractional effective PDR makes these non-integral — round for display
+            // only, never for the underlying figures.
+            if (effortHours) effortHours.textContent = hours.toLocaleString(undefined, { maximumFractionDigits: 1 });
             if (effortMonths) effortMonths.textContent = months;
-            if (effortCost) effortCost.textContent = '$' + cost.toLocaleString();
+            if (effortCost) effortCost.textContent = '$' + Math.round(cost).toLocaleString();
             
-            // Update assumptions display
-            const assumptionPdr = document.getElementById('assumption-pdr');
-            const assumptionRate = document.getElementById('assumption-rate');
-            if (assumptionPdr) assumptionPdr.textContent = pdr;
-            if (assumptionRate) assumptionRate.textContent = '$' + hourlyRate;
-            
+            // Keep the assumptions panel's derived readouts in sync
+            renderPDRChain();
+
             // Update SDLC breakdown in Effort tab
             renderSDLCBreakdown(hours, cost);
             renderCostBreakdown(hours, cost, hourlyRate);
@@ -1721,8 +1967,8 @@
                             }).join('')}
                             <tr class="bg-gray-50 font-bold">
                                 <td class="border border-gray-300 px-4 py-2" colspan="2">Total</td>
-                                <td class="border border-gray-300 px-4 py-2 text-right font-mono">${totalHours.toLocaleString()}</td>
-                                <td class="border border-gray-300 px-4 py-2 text-right font-mono text-green-600">$${totalCost.toLocaleString()}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-right font-mono">${totalHours.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-right font-mono text-green-600">$${Math.round(totalCost).toLocaleString()}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1755,9 +2001,8 @@
                 });
                 const vaf = getVAF();
                 const afp = Math.round(ufp * vaf);
-                const pdr = wbsData.config?.defaultPDR || 8;
-                totalHours = afp * pdr;
-                const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 75;
+                totalHours = afp * getEffectivePDR();
+                const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || numOr(wbsData.config?.defaultHourlyRate, 75);
                 totalCost = totalHours * hourlyRate;
             }
 
