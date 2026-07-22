@@ -45,3 +45,12 @@
 - [x] 7.2 Remove `openspec/changes/add-capability-level-inclusion/` from `ctms-gtm-mono-repo` (superseded by `specs/fp-estimation-engine/spec.md` here)
 - [x] 7.3 Leave `ai-agents-provly/inputs/` and `ai-agents-provly/pitch-deck/` in place in the source repo (out of scope — not FP-estimation content)
 - [x] 7.4 Commit the removal in the source repo with a message explaining the migration and pointing at this repo
+
+## 8. Architecture Decision Records
+- [x] 8.1 Confirm no ADRs exist anywhere in `ctms-gtm-mono-repo` to copy/adapt (repo-wide search came up empty — only an unrelated deploy guide in `docs/`)
+- [x] 8.2 Write `docs/adr/0001-record-architecture-decisions.md` (meta-ADR establishing the practice)
+- [x] 8.3 Write `docs/adr/0002-separate-generic-app-layer-from-per-project-data.md`
+- [x] 8.4 Write `docs/adr/0003-merge-datasets-in-go-at-request-time.md`
+- [x] 8.5 Write `docs/adr/0004-defer-access-control.md`
+- [x] 8.6 Write `docs/adr/0005-namespace-client-state-by-active-dataset.md`
+- [x] 8.7 Cross-link ADRs from `README.md`, `CLAUDE.md`, and this change's `design.md`

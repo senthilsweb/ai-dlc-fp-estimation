@@ -35,3 +35,7 @@ See `.claude/skills/add-fp-dataset/SKILL.md` and the README's "Adding a new data
 ## Spec-driven workflow
 
 Follow `openspec/AGENTS.md` for any new capability or architecture change: scaffold a proposal under `openspec/changes/<change-id>/` (proposal.md, tasks.md, spec deltas), get it reviewed, implement, then archive. `openspec/specs/` holds the specs for what's actually built.
+
+## Architecture Decision Records
+
+The four non-negotiables above are each backed by an ADR in `docs/adr/` — read those before reversing one of them, and add a new ADR (see `docs/adr/0001-record-architecture-decisions.md` for when one is warranted) rather than silently reintroducing something a prior ADR deliberately ruled out (e.g. don't resurrect role-gating without a new ADR revisiting ADR-0004).

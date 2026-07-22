@@ -63,6 +63,10 @@ See `.claude/skills/add-fp-dataset/SKILL.md` for the step-by-step checklist.
 
 This project follows the OpenSpec workflow — see `openspec/AGENTS.md` for the process and `openspec/project.md` for conventions. Active proposals live in `openspec/changes/`; built capabilities are recorded in `openspec/specs/`.
 
+## Architecture Decision Records
+
+The *why* behind this repo's structure is recorded in `docs/adr/` — see [`docs/adr/README.md`](docs/adr/README.md) for the index. Start with [ADR-0002](docs/adr/0002-separate-generic-app-layer-from-per-project-data.md) (app/data split) and [ADR-0004](docs/adr/0004-defer-access-control.md) (why there's no auth) if you're new here.
+
 ## Provenance
 
 The app layer and estimation engine originated as `ctms-business-features-fp` in the `ctms-gtm-mono-repo`, and was forked once for Provly (`ai-agents-provly/business-features-fp`). This repo carries that engine forward as the generic, data-partitioned successor to both forks — the multi-tenant Go server, request-time JSON merge, and per-dataset `localStorage` namespacing didn't exist in either predecessor.

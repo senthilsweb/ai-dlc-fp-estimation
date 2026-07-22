@@ -42,3 +42,7 @@ The FP estimator existed as two forks in `ctms-gtm-mono-repo`, diverging only in
 ## Open Questions
 
 - Should a future `data/templrpress/` (or other) dataset get its own openspec change, or is adding a dataset covered entirely by the `add-fp-dataset` skill without a proposal? Current expectation: dataset additions are content changes (skip-proposal per `openspec/AGENTS.md`'s triage rules) unless they require an app/server code change.
+
+## Related ADRs
+
+The four decisions above are recorded permanently in `docs/adr/`, since they're expected to outlive this specific change's proposal: [0002](../../../docs/adr/0002-separate-generic-app-layer-from-per-project-data.md) (app/data split), [0003](../../../docs/adr/0003-merge-datasets-in-go-at-request-time.md) (Go-native merge), [0004](../../../docs/adr/0004-defer-access-control.md) (no access control), [0005](../../../docs/adr/0005-namespace-client-state-by-active-dataset.md) (localStorage namespacing).
