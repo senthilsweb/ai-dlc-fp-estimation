@@ -4,6 +4,27 @@
 > This document captures the owner's reasoning for what this tool is becoming and why.
 > Numbers here are **starting points to be calibrated**, not findings. See [Calibration](#8-calibration-how-this-stops-being-guesswork).
 
+## 0. Positioning and vocabulary
+
+This tool estimates software delivery along the **delivery continuum**:
+
+| Stage | Who does the work | Modelled as |
+|---|---|---|
+| **Human-led** | People write the software | Nominal PDR, no factors — conventional benchmarks apply |
+| **AI-Assisted** | Human-led build, agent assists (completion, drafting, review support); the human owns the work | A productivity factor |
+| **AI-Native** (agent-led) | Agent produces the bulk; human steers, reviews, decides, approves | A productivity factor |
+
+The stages are **values in the tool, not labels on it** — each is a productivity factor composing onto the nominal human baseline, so an estimate can sit anywhere along the continuum, including partway between stages. That is the direct benefit of composition (§3): the continuum is expressible rather than being three hard-coded modes.
+
+**AI-DLC** is the reference *methodology* for the AI-Native end, and supplies the hierarchy vocabulary (Intent → Bolt → Unit of Work).
+
+**On terminology choices.** These follow how the market already frames it, so the tool is legible to people outside this repo:
+
+- GlobalLogic's **VelocityAI** describes guiding enterprises along *"a delivery continuum, from human-led to increasingly AI-native software development"* — hence *continuum* and *AI-native* rather than invented alternatives.
+- Ascendion positions as *"AI-Native Software Engineering Services"*, with **AAVA** (Agentic Value Accelerator) as the agentic platform and *EngineeringAI* as the method.
+
+Deliberately avoided: **"AI Engineering"**, which in industry means engineering *AI systems* (building ML/LLM products) — the inverse of engineering *with* AI, and a guaranteed source of confusion.
+
 ## 1. The gap this fills
 
 There is no scientific estimation mechanism for AI-DLC — or for AI-assisted delivery generally — where **the agent does ~90% of the work and the human is the steerer, reviewer, decision maker, and approver of anything requiring approval.**

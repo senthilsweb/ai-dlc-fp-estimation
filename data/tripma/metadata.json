@@ -300,8 +300,8 @@
     "productivityFactors": {
       "aiAssisted": {
         "factor": 0.65,
-        "label": "AI Agent-Assisted",
-        "description": "Human-led build with an AI agent assisting (code completion, drafting, review support). Vendor-neutral."
+        "label": "AI-Assisted Delivery",
+        "description": "Middle of the delivery continuum \u2014 human-led build with an AI agent assisting (completion, drafting, review support). The human still owns the work."
       },
       "experiencedTeam": {
         "factor": 0.8,

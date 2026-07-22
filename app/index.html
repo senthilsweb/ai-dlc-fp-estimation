@@ -764,13 +764,15 @@
                             <iconify-icon icon="mdi:robot-outline" class="text-blue-600 mt-0.5 flex-shrink-0"></iconify-icon>
                             <div>
                                 <strong>What this tool is for.</strong>
-                                Estimating software delivery across the spectrum from human-led, through AI-assisted, to
-                                <strong>agent-led</strong> — where an AI agent does the bulk of the work and the human steers, reviews,
-                                decides and approves. <strong>AI-DLC</strong> is the reference methodology it is modelled on.
-                                Function Points remain the invariant measure — a function’s size does not change because an agent wrote it —
-                                which is precisely what makes agent-led and human-led delivery comparable. The delivery <em>rate</em> is what
-                                changes, and that is expressed through the configurable knobs in Effort &amp; Cost.
-                                <span class="block mt-1 text-blue-700">Published estimation benchmarks all assume a human writes the code; no calibrated model exists for agent-led delivery yet. Treat outputs as tunable projections until calibrated against your own actuals.</span>
+                                Estimating software delivery along the <strong>delivery continuum</strong> —
+                                <strong>human-led</strong> → <strong>AI-assisted</strong> → <strong>AI-native</strong> (agent-led) —
+                                where at the far end an AI agent does the bulk of the work and the human steers, reviews, decides
+                                and approves. <strong>AI-DLC</strong> is the reference methodology it is modelled on.
+                                <span class="block mt-1">Function Points stay the invariant measure — a function’s size does not change because an agent wrote it —
+                                which is exactly what makes these stages comparable to each other. What changes along the continuum is the
+                                delivery <em>rate</em>, expressed through the configurable knobs in Effort &amp; Cost: the productivity
+                                factors are the stages, and they compose onto a nominal human baseline.</span>
+                                <span class="block mt-1 text-blue-700">Published estimation benchmarks all assume a human writes the code; no calibrated model exists for AI-native delivery yet. Treat outputs as tunable projections until calibrated against your own actuals.</span>
                             </div>
                         </div>
                     </div>
@@ -889,7 +891,7 @@
         // Product identity for the binary itself — distinct from any dataset it
         // serves. The footer uses these; the header uses the dataset's branding.
         const TOOL_NAME = 'FP Estimator';
-        const TOOL_TAGLINE = 'Function Point estimation for AI-assisted & agent-led delivery';
+        const TOOL_TAGLINE = 'Function Point estimation across the delivery continuum — human-led · AI-assisted · AI-native';
         const TOOL_VERSION = '0.1.0';
 
         let wbsData = null;
@@ -2381,7 +2383,10 @@
             { term: 'Nominal PDR', fullName: 'Nominal Project Delivery Rate', definition: 'The delivery rate BEFORE any AI adjustment — the human baseline for the stack (conventionally ~8 h/FP for enterprise work). It must not be pre-discounted for AI: the productivity factors carry that speedup. Setting a discounted nominal rate AND ticking an AI factor counts the same gain twice. Mirrors COCOMO’s “nominal effort” before effort multipliers.' },
             { term: 'Effective PDR', fullName: 'Effective Project Delivery Rate', definition: 'The rate actually used, after composing the productivity factors onto the nominal rate. Composition keeps each assumption separately visible and separately calibratable — a single blended figure cannot tell you which assumption was wrong when actuals arrive.', formula: 'effective PDR = nominal PDR × Π(active productivity factors)' },
             { term: 'Productivity Factor', fullName: 'Productivity Factor', definition: 'A multiplier on the nominal rate. Below 1 speeds delivery up, above 1 slows it down; ticked factors compound. This is where AI speedup belongs — e.g. AI Agent-Assisted for a human-led build with agent support, versus agent-led delivery where the agent does the bulk and the human steers, reviews and approves.' },
-            { term: 'AI-DLC', fullName: 'AI Development Life Cycle', definition: 'The reference methodology this tool is built for: an agent performs the bulk of the work while the human acts as steerer, reviewer, decision maker and approver. No calibrated industry estimation model exists for this mode of working — every published benchmark assumes a human writes the code — which is the gap this tool addresses.' },
+            { term: 'Delivery Continuum', fullName: 'Human-led → AI-Assisted → AI-Native', definition: 'The range of delivery modes this tool estimates. Human-led: people write the software, conventional benchmarks apply. AI-Assisted: a human-led build with an AI agent supporting — code completion, drafting, review support; the human still owns the work. AI-Native (agent-led): the agent produces the bulk of the output and the human steers, reviews, decides and approves. The stages are not labels on the tool but values in it — each is a productivity factor composing onto the nominal human baseline, so an estimate can sit anywhere along the continuum, including partway.' },
+            { term: 'AI-Assisted', fullName: 'AI-Assisted Delivery', definition: 'The middle of the delivery continuum: a human-led build with an AI agent assisting. The human writes and owns the work; the agent accelerates it. Distinct from AI-Native, where the agent does the bulk and the human supervises. Modelled here as a productivity factor, so it can be combined with others (team experience, component reuse) rather than being an all-or-nothing mode.' },
+            { term: 'AI-Native', fullName: 'AI-Native Delivery (agent-led)', definition: 'The far end of the delivery continuum: agents produce most of the output and the human is steerer, reviewer, decision maker and approver. The industry term for this mode — used by major engineering-services platforms — and what AI-DLC operationalises as a method.' },
+            { term: 'AI-DLC', fullName: 'AI Development Life Cycle', definition: 'The reference methodology this tool is built for: an agent performs the bulk of the work while the human acts as steerer, reviewer, decision maker and approver. It supplies the vocabulary below — Intent, Bolt, Unit of Work. No calibrated industry estimation model exists for this mode of working — every published benchmark assumes a human writes the code — which is the gap this tool addresses.' },
             { term: 'Intent', fullName: 'Intent (AI-DLC)', definition: 'The top level of an AI-DLC breakdown: a high-level goal stated in plain language, from which everything else grows. Maps to the first level of this tool’s hierarchy.' },
             { term: 'Bolt', fullName: 'Bolt (AI-DLC)', definition: 'A short burst of construction — hours or days rather than the weeks of a Scrum sprint, which it replaces. The estimable work packet: a bolt is fully deployable once done. Maps to the second level of this tool’s hierarchy.' },
             { term: 'Unit of Work', fullName: 'Unit of Work / Task (AI-DLC)', definition: 'One small, self-contained thing to build — replaces the Agile “story”. Eval design, test-data preparation and rubric authoring are units of work like any other, sized the same way, not a separate category of effort. Maps to the third level of this tool’s hierarchy.' },
