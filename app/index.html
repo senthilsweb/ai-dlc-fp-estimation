@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FP Estimator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tree-item { transition: all 0.2s ease; }
+        .tree-item:hover { background-color: #f8fafc; }
+        
+        .status-circle { width: 16px; height: 16px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .status-completed { background: #22c55e; }
+        .status-partial { background: linear-gradient(90deg, #22c55e 50%, transparent 50%); border: 2px solid #22c55e; }
+        .status-in-progress { background: #3b82f6; animation: pulse 2s infinite; }
+        .status-roadmap { background: transparent; border: 3px solid #8b5cf6; }
+        .status-beta { background: #06b6d4; }
+        .status-deprecated { background: #ef4444; position: relative; }
+        .status-deprecated::after { content: '×'; color: white; font-size: 10px; font-weight: bold; }
+        .status-onhold { background: #6b7280; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        main { flex: 1; }
+        
+        /* Print styles */
+        @media print {
+            header, nav, footer { display: none !important; }
+            .print\\:hidden { display: none !important; }
+            body { background: white; }
+            .tab-content { display: block !important; page-break-inside: avoid; }
+            #tab-wbs, #tab-calculator { display: block !important; }
+            #tab-techstack, #tab-glossary, #tab-gsc { display: none !important; }
+            .bg-white { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+        }
+        
+        /* GSC Slider styling */
+        .gsc-slider { -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; background: #e5e7eb; outline: none; }
+        .gsc-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #3b82f6; cursor: pointer; }
+        .gsc-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #3b82f6; cursor: pointer; border: none; }
+        
+        /* Hero gradient pattern */
+        .bg-grid-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <div id="app" class="flex flex-col min-h-screen">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div id="appIconBadge" class="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+                            <iconify-icon id="appIcon" icon="mdi:calculator-variant" class="text-white text-xl"></iconify-icon>
+                        </div>
+                        <div>
+                            <h1 id="mainTitle" class="text-xl font-bold text-gray-900">FP Estimator</h1>
+                            <p class="text-sm text-gray-500">Work Breakdown Structure & Effort Estimation</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 sm:gap-4 flex-wrap justify-end">
+                        <div class="flex items-center gap-2 bg-gray-100 rounded-lg px-2 sm:px-3 py-2">
+                            <iconify-icon icon="mdi:currency-usd" class="text-gray-500"></iconify-icon>
+                            <label class="text-sm text-gray-600 hidden sm:inline">Rate/hr:</label>
+                            <input type="number" id="hourlyRate" value="75" min="1" max="500" 
+                                   class="w-16 sm:w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <button onclick="exportToExcel()" class="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            <iconify-icon icon="mdi:microsoft-excel"></iconify-icon>
+                            <span class="hidden sm:inline">Export Excel</span>
+                        </button>
+                        <button onclick="exportToPDF()" class="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition print:hidden">
+                            <iconify-icon icon="mdi:file-pdf-box"></iconify-icon>
+                            <span class="hidden sm:inline">Export PDF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="bg-white border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex gap-1 overflow-x-auto" id="tabs">
+                    <button onclick="showTab('project')" class="tab-btn tab-active px-4 py-3 text-sm font-medium flex items-center gap-2 whitespace-nowrap" data-tab="project">
+                        <iconify-icon icon="mdi:view-dashboard-outline"></iconify-icon>
+                        <span class="hidden sm:inline">Project</span>
+                        <span class="sm:hidden">Proj</span>
+                    </button>
+                    <button onclick="showTab('wbs')" class="tab-btn px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="wbs">
+                        <iconify-icon icon="mdi:file-tree"></iconify-icon>
+                        <span class="hidden sm:inline">WBS Overview</span>
+                        <span class="sm:hidden">WBS</span>
+                    </button>
+                    <button onclick="showTab('techstack')" class="tab-btn px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="techstack">
+                        <iconify-icon icon="mdi:layers-triple"></iconify-icon>
+                        <span class="hidden sm:inline">Tech Stack</span>
+                        <span class="sm:hidden">Tech</span>
+                    </button>
+                    <button onclick="showTab('effort')" class="tab-btn px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="effort">
+                        <iconify-icon icon="mdi:chart-timeline-variant"></iconify-icon>
+                        <span class="hidden sm:inline">Effort & Cost</span>
+                        <span class="sm:hidden">Cost</span>
+                    </button>
+                    <button onclick="showTab('calculator')" class="tab-btn px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="calculator">
+                        <iconify-icon icon="mdi:calculator"></iconify-icon>
+                        <span class="hidden sm:inline">FP Calculator</span>
+                        <span class="sm:hidden">FP</span>
+                    </button>
+                    <button onclick="showTab('gsc')" class="tab-btn px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="gsc">
+                        <iconify-icon icon="mdi:tune-vertical"></iconify-icon>
+                        <span class="hidden sm:inline">GSC Factors</span>
+                        <span class="sm:hidden">GSC</span>
+                    </button>
+                    <button onclick="showTab('fpguide')" class="tab-btn px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="fpguide">
+                        <iconify-icon icon="mdi:school"></iconify-icon>
+                        <span class="hidden sm:inline">FP Guide</span>
+                        <span class="sm:hidden">Guide</span>
+                    </button>
+                    <button onclick="showTab('glossary')" class="tab-btn px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-600 hover:text-gray-900 whitespace-nowrap" data-tab="glossary">
+                        <iconify-icon icon="mdi:book-open-page-variant"></iconify-icon>
+                        <span class="hidden sm:inline">Glossary</span>
+                        <span class="sm:hidden">Ref</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+            <!-- Project Summary Tab -->
+            <div id="tab-project" class="tab-content">
+                <div id="project-summary-content">
+                    <!-- Project summary will be rendered here or empty state shown -->
+                </div>
+            </div>
+
+            <!-- WBS Tab -->
+            <div id="tab-wbs" class="tab-content hidden">
+                <!-- Summary Cards - Simplified -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                        <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+                            <iconify-icon icon="mdi:package-variant"></iconify-icon>
+                            Products
+                        </div>
+                        <div id="stat-products" class="text-2xl font-bold text-gray-900">0</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                        <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+                            <iconify-icon icon="mdi:puzzle"></iconify-icon>
+                            Features
+                        </div>
+                        <div id="stat-features" class="text-2xl font-bold text-gray-900">0</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                        <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+                            <iconify-icon icon="mdi:cog"></iconify-icon>
+                            Capabilities
+                        </div>
+                        <div id="stat-capabilities" class="text-2xl font-bold text-gray-900">0</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                        <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+                            <iconify-icon icon="mdi:function"></iconify-icon>
+                            Function Points <span class="text-xs text-gray-400">(UFP)</span>
+                        </div>
+                        <div id="stat-fp" class="text-2xl font-bold text-blue-600">0</div>
+                    </div>
+                </div>
+
+                <!-- Function Point Types Legend -->
+                <div class="bg-white rounded-xl p-4 border border-gray-200 mb-4">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Function Point Types & Complexity</h3>
+                    <div class="flex flex-wrap gap-x-6 gap-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold px-2 py-1 rounded bg-blue-600 text-white">EI</span>
+                            <span class="text-sm text-gray-600">External Input</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold px-2 py-1 rounded bg-green-600 text-white">EO</span>
+                            <span class="text-sm text-gray-600">External Output</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold px-2 py-1 rounded bg-purple-600 text-white">EQ</span>
+                            <span class="text-sm text-gray-600">External Inquiry</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold px-2 py-1 rounded bg-orange-600 text-white">ILF</span>
+                            <span class="text-sm text-gray-600">Internal Logical File</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold px-2 py-1 rounded bg-pink-600 text-white">EIF</span>
+                            <span class="text-sm text-gray-600">External Interface File</span>
+                        </div>
+                        <span class="text-gray-300">|</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium px-2 py-1 rounded bg-gray-200 text-gray-700">L</span>
+                            <span class="text-sm text-gray-600">Low</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium px-2 py-1 rounded bg-gray-300 text-gray-700">A</span>
+                            <span class="text-sm text-gray-600">Average</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium px-2 py-1 rounded bg-gray-400 text-white">H</span>
+                            <span class="text-sm text-gray-600">High</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Legend (clickable filters) -->
+                <div class="bg-white rounded-xl p-4 border border-gray-200 mb-6">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Status Filter <span class="font-normal text-gray-400">(click to toggle)</span></h3>
+                    <div class="flex flex-wrap gap-4" id="status-legend">
+                        <label class="flex items-center gap-2 cursor-pointer select-none" onclick="toggleStatusFilter('completed')">
+                            <input type="checkbox" id="filter-completed" checked class="w-4 h-4 rounded text-green-600 border-gray-300 focus:ring-green-500 cursor-pointer">
+                            <span class="status-circle status-completed"></span>
+                            <span class="text-sm" id="label-completed">Completed</span>
+                            <span id="count-completed" class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">0</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none" onclick="toggleStatusFilter('partial')">
+                            <input type="checkbox" id="filter-partial" checked class="w-4 h-4 rounded text-yellow-600 border-gray-300 focus:ring-yellow-500 cursor-pointer">
+                            <span class="status-circle status-partial"></span>
+                            <span class="text-sm" id="label-partial">Partial</span>
+                            <span id="count-partial" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">0</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none" onclick="toggleStatusFilter('in-progress')">
+                            <input type="checkbox" id="filter-in-progress" checked class="w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer">
+                            <span class="status-circle status-in-progress"></span>
+                            <span class="text-sm" id="label-in-progress">In Progress</span>
+                            <span id="count-in-progress" class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">0</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none" onclick="toggleStatusFilter('roadmap')">
+                            <input type="checkbox" id="filter-roadmap" checked class="w-4 h-4 rounded text-purple-600 border-gray-300 focus:ring-purple-500 cursor-pointer">
+                            <span class="status-circle status-roadmap"></span>
+                            <span class="text-sm" id="label-roadmap">Roadmap</span>
+                            <span id="count-roadmap" class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">0</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none" onclick="toggleStatusFilter('beta')">
+                            <input type="checkbox" id="filter-beta" checked class="w-4 h-4 rounded text-cyan-600 border-gray-300 focus:ring-cyan-500 cursor-pointer">
+                            <span class="status-circle status-beta"></span>
+                            <span class="text-sm" id="label-beta">Beta</span>
+                            <span id="count-beta" class="text-xs bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full">0</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- WBS Tree -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="p-4 border-b border-gray-200 flex items-center justify-between flex-wrap gap-2">
+                        <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+                            <iconify-icon icon="mdi:file-tree" class="text-blue-600"></iconify-icon>
+                            Work Breakdown Structure
+                            <span class="text-xs font-normal text-gray-500">(check/uncheck to include in calculation)</span>
+                        </h2>
+                        <div class="flex gap-2 flex-wrap">
+                            <button id="toggleInclusionBtn" onclick="toggleAllInclusions()" class="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 flex items-center gap-1">
+                                <iconify-icon icon="mdi:checkbox-marked-outline"></iconify-icon>
+                                <span>Include All</span>
+                            </button>
+                            <button onclick="expandAll()" class="text-sm px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center gap-1">
+                                <iconify-icon icon="mdi:unfold-more-horizontal"></iconify-icon>
+                                Expand All
+                            </button>
+                            <button onclick="collapseAll()" class="text-sm px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center gap-1">
+                                <iconify-icon icon="mdi:unfold-less-horizontal"></iconify-icon>
+                                Collapse All
+                            </button>
+                        </div>
+                    </div>
+                    <div id="wbs-tree" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <!-- FP Calculator Tab -->
+            <div id="tab-calculator" class="tab-content hidden">
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- FP Types Reference -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+                                <iconify-icon icon="mdi:function-variant" class="text-blue-600"></iconify-icon>
+                                Function Point Types (IFPUG)
+                            </h2>
+                        </div>
+                        <div id="fp-types-table" class="p-4"></div>
+                    </div>
+
+                    <!-- Productivity Factors -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <div class="p-4 border-b border-gray-200">
+                            <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+                                <iconify-icon icon="mdi:trending-up" class="text-green-600"></iconify-icon>
+                                Productivity Adjustment Factors
+                            </h2>
+                        </div>
+                        <div id="productivity-factors" class="p-4 space-y-3"></div>
+                    </div>
+
+                    <!-- Tech Stack Factors -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden lg:col-span-2">
+                        <div class="p-4 border-b border-gray-200">
+                            <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+                                <iconify-icon icon="mdi:code-braces" class="text-purple-600"></iconify-icon>
+                                Technology Complexity Factors
+                            </h2>
+                        </div>
+                        <div id="tech-factors" class="p-4 grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+                    </div>
+
+                    <!-- Estimation Formula -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden lg:col-span-2">
+                        <div class="p-4 border-b border-gray-200">
+                            <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+                                <iconify-icon icon="mdi:calculator-variant" class="text-orange-600"></iconify-icon>
+                                Effort Estimation Formula
+                            </h2>
+                        </div>
+                        <div class="p-6 bg-gradient-to-r from-blue-50 to-purple-50">
+                            <div class="text-center space-y-4">
+                                <div class="text-lg font-mono bg-white px-6 py-4 rounded-lg shadow-sm inline-block">
+                                    <span class="text-blue-600">Effort</span> = 
+                                    <span class="text-green-600">UFP</span> × 
+                                    <span class="text-purple-600">PDR</span> × 
+                                    <span class="text-orange-600">Tech Factor</span> × 
+                                    <span class="text-pink-600">Productivity Factor</span>
+                                </div>
+                                <div class="grid md:grid-cols-4 gap-4 text-sm">
+                                    <div class="bg-white p-3 rounded-lg">
+                                        <div class="font-semibold text-green-600">UFP</div>
+                                        <div class="text-gray-600">Unadjusted Function Points</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg">
+                                        <div class="font-semibold text-purple-600">PDR</div>
+                                        <div class="text-gray-600">Hours per FP (default: 8-10)</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg">
+                                        <div class="font-semibold text-orange-600">Tech Factor</div>
+                                        <div class="text-gray-600">0.8x - 1.8x complexity</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg">
+                                        <div class="font-semibold text-pink-600">Productivity</div>
+                                        <div class="text-gray-600">0.5x - 1.2x team factor</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tech Stack Tab -->
+            <div id="tab-techstack" class="tab-content hidden">
+                <div id="techstack-content" class="space-y-6"></div>
+            </div>
+
+            <!-- Effort & Cost Tab -->
+            <div id="tab-effort" class="tab-content hidden">
+                <div class="space-y-6">
+                    <!-- Effort Summary Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                            <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+                                <iconify-icon icon="mdi:function"></iconify-icon>
+                                UFP <span class="text-xs text-gray-400">(Raw)</span>
+                            </div>
+                            <div id="effort-ufp" class="text-2xl font-bold text-blue-600">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm bg-gradient-to-br from-orange-50 to-white">
+                            <div class="flex items-center gap-2 text-orange-600 text-sm mb-1">
+                                <iconify-icon icon="mdi:function-variant"></iconify-icon>
+                                AFP <span class="text-xs text-orange-400">(Adjusted)</span>
+                            </div>
+                            <div id="effort-afp" class="text-2xl font-bold text-orange-600">0</div>
+                            <div id="effort-vaf" class="text-xs text-orange-400">VAF: 1.00</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                            <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+                                <iconify-icon icon="mdi:clock-outline"></iconify-icon>
+                                Est. Hours
+                            </div>
+                            <div id="effort-hours" class="text-2xl font-bold text-purple-600">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                            <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+                                <iconify-icon icon="mdi:calendar-range"></iconify-icon>
+                                Est. Months
+                            </div>
+                            <div id="effort-months" class="text-2xl font-bold text-indigo-600">0</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                            <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+                                <iconify-icon icon="mdi:currency-usd"></iconify-icon>
+                                Est. Cost
+                            </div>
+                            <div id="effort-cost" class="text-2xl font-bold text-green-600">$0</div>
+                        </div>
+                    </div>
+
+                    <!-- SDLC Phase Breakdown -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:chart-timeline-variant" class="text-blue-600"></iconify-icon>
+                            SDLC Effort Breakdown
+                        </h3>
+                        <div id="effort-sdlc-breakdown" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            <!-- SDLC phases will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Cost Breakdown by Phase -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:cash-multiple" class="text-green-600"></iconify-icon>
+                            Cost Breakdown by SDLC Phase
+                        </h3>
+                        <div id="cost-breakdown" class="space-y-4">
+                            <!-- Cost breakdown will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Estimation Assumptions -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:information-outline" class="text-purple-600"></iconify-icon>
+                            Estimation Assumptions
+                        </h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="font-semibold text-gray-700 mb-2">Productivity Delivery Rate</div>
+                                <div class="text-2xl font-bold text-purple-600" id="assumption-pdr">8</div>
+                                <div class="text-gray-500 text-xs">Hours per Function Point</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="font-semibold text-gray-700 mb-2">Hourly Rate</div>
+                                <div class="text-2xl font-bold text-green-600" id="assumption-rate">$50</div>
+                                <div class="text-gray-500 text-xs">Blended resource rate</div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="font-semibold text-gray-700 mb-2">Working Hours/Month</div>
+                                <div class="text-2xl font-bold text-blue-600">160</div>
+                                <div class="text-gray-500 text-xs">Standard 8hr × 20 days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FP Guide Tab -->
+            <div id="tab-fpguide" class="tab-content hidden">
+                <div class="space-y-6">
+                    <!-- Introduction -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:lightbulb-on-outline" class="text-yellow-500"></iconify-icon>
+                            How FP Types & Complexity Were Assigned
+                        </h2>
+                        <p class="text-gray-600 mb-4">
+                            This guide explains the methodology used to assign Function Point types and complexity ratings to each capability in the WBS. 
+                            We follow the <strong>IFPUG (International Function Point Users Group)</strong> standard counting practices manual (CPM).
+                        </p>
+                    </div>
+
+                    <!-- Function Types Explained -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:format-list-bulleted-type" class="text-blue-600"></iconify-icon>
+                            Function Point Types
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                <h4 class="font-semibold text-gray-800">EI - External Input</h4>
+                                <p class="text-gray-600 text-sm">Data or control information that enters the system from outside its boundary. Examples: form submissions, file uploads, API requests that modify data.</p>
+                            </div>
+                            <div class="border-l-4 border-green-500 pl-4 py-2">
+                                <h4 class="font-semibold text-gray-800">EO - External Output</h4>
+                                <p class="text-gray-600 text-sm">Data that leaves the system with processing logic (calculations, transformations, derivations). Examples: reports with totals, dashboard metrics, export with aggregations.</p>
+                            </div>
+                            <div class="border-l-4 border-purple-500 pl-4 py-2">
+                                <h4 class="font-semibold text-gray-800">EQ - External Inquiry</h4>
+                                <p class="text-gray-600 text-sm">Simple data retrieval without significant processing. Examples: search results, detail views, lookup operations.</p>
+                            </div>
+                            <div class="border-l-4 border-orange-500 pl-4 py-2">
+                                <h4 class="font-semibold text-gray-800">ILF - Internal Logical File</h4>
+                                <p class="text-gray-600 text-sm">Logically related groups of data maintained within the system. Examples: database tables, configuration stores, user profiles.</p>
+                            </div>
+                            <div class="border-l-4 border-pink-500 pl-4 py-2">
+                                <h4 class="font-semibold text-gray-800">EIF - External Interface File</h4>
+                                <p class="text-gray-600 text-sm">Data referenced from external systems but not maintained by this application. Examples: external API data, third-party integrations.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Complexity Assignment -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:gauge" class="text-purple-600"></iconify-icon>
+                            Complexity Rating Methodology
+                        </h3>
+                        <p class="text-gray-600 mb-4">Complexity is determined by counting Data Element Types (DETs) and related files:</p>
+                        
+                        <!-- Transactional Functions Matrix -->
+                        <div class="mb-6">
+                            <h4 class="font-semibold text-gray-800 mb-3">Transactional Functions (EI, EO, EQ)</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="border border-gray-300 px-4 py-2 text-left">DETs</th>
+                                            <th class="border border-gray-300 px-4 py-2 text-center">1-4 FTRs</th>
+                                            <th class="border border-gray-300 px-4 py-2 text-center">5-15 FTRs</th>
+                                            <th class="border border-gray-300 px-4 py-2 text-center">16+ FTRs</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="border border-gray-300 px-4 py-2">1-4 DETs</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-green-50 text-green-700 font-semibold">Low</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-green-50 text-green-700 font-semibold">Low</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-yellow-50 text-yellow-700 font-semibold">Average</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-gray-300 px-4 py-2">5-15 DETs</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-green-50 text-green-700 font-semibold">Low</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-yellow-50 text-yellow-700 font-semibold">Average</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-red-50 text-red-700 font-semibold">High</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-gray-300 px-4 py-2">16+ DETs</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-yellow-50 text-yellow-700 font-semibold">Average</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-red-50 text-red-700 font-semibold">High</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-red-50 text-red-700 font-semibold">High</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">
+                                <strong>DET</strong> = Data Element Type (unique user-recognizable fields)
+                                <br><strong>FTR</strong> = File Type Referenced (logical files accessed by the transaction)
+                            </p>
+                        </div>
+
+                        <!-- Data Functions Matrix -->
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">Data Functions (ILF, EIF)</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="border border-gray-300 px-4 py-2 text-left">DETs</th>
+                                            <th class="border border-gray-300 px-4 py-2 text-center">1 RET</th>
+                                            <th class="border border-gray-300 px-4 py-2 text-center">2-5 RETs</th>
+                                            <th class="border border-gray-300 px-4 py-2 text-center">6+ RETs</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="border border-gray-300 px-4 py-2">1-19 DETs</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-green-50 text-green-700 font-semibold">Low</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-green-50 text-green-700 font-semibold">Low</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-yellow-50 text-yellow-700 font-semibold">Average</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-gray-300 px-4 py-2">20-50 DETs</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-green-50 text-green-700 font-semibold">Low</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-yellow-50 text-yellow-700 font-semibold">Average</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-red-50 text-red-700 font-semibold">High</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-gray-300 px-4 py-2">51+ DETs</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-yellow-50 text-yellow-700 font-semibold">Average</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-red-50 text-red-700 font-semibold">High</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center bg-red-50 text-red-700 font-semibold">High</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">
+                                <strong>RET</strong> = Record Element Type (user-recognizable subgroups within the data function)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- FP Weights Table -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:weight" class="text-orange-600"></iconify-icon>
+                            Function Point Weights (IFPUG Standard)
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="border border-gray-300 px-4 py-2 text-left">Function Type</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-center bg-green-50">Low</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-center bg-yellow-50">Average</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-center bg-red-50">High</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2 font-semibold">EI (External Input)</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">3</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">4</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">6</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2 font-semibold">EO (External Output)</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">4</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">5</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">7</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2 font-semibold">EQ (External Inquiry)</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">3</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">4</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">6</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2 font-semibold">ILF (Internal Logical File)</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">7</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">10</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">15</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2 font-semibold">EIF (External Interface File)</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">5</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">7</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">10</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Assignment Examples -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:file-document-outline" class="text-green-600"></iconify-icon>
+                            Assignment Examples from This Project
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-blue-800 mb-2">User Login Form → EI (Average)</h4>
+                                <p class="text-sm text-gray-700">
+                                    <strong>Why EI:</strong> Data enters the system (username, password)<br>
+                                    <strong>Why Average:</strong> 5-10 DETs (username, password, remember me, CAPTCHA, etc.), references 1-2 files (Users, Sessions) = Average complexity
+                                </p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-green-800 mb-2">Dashboard Metrics → EO (High)</h4>
+                                <p class="text-sm text-gray-700">
+                                    <strong>Why EO:</strong> Data leaves with processing (calculations, aggregations)<br>
+                                    <strong>Why High:</strong> 20+ DETs (multiple KPIs, charts, summaries), references 5+ files (Studies, Subjects, Sites, etc.) = High complexity
+                                </p>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-purple-800 mb-2">Study List View → EQ (Low)</h4>
+                                <p class="text-sm text-gray-700">
+                                    <strong>Why EQ:</strong> Simple data retrieval, no complex processing<br>
+                                    <strong>Why Low:</strong> 4-5 DETs (study name, status, date), references 1 file (Studies) = Low complexity
+                                </p>
+                            </div>
+                            <div class="bg-orange-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-orange-800 mb-2">Study Configuration Store → ILF (Average)</h4>
+                                <p class="text-sm text-gray-700">
+                                    <strong>Why ILF:</strong> Data maintained by the application<br>
+                                    <strong>Why Average:</strong> 20-40 DETs (study metadata fields), 2-4 RETs (study, arms, visits, forms) = Average complexity
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Glossary Tab -->
+            <div id="tab-glossary" class="tab-content hidden">
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="p-4 border-b border-gray-200">
+                        <h2 class="font-semibold text-gray-900 flex items-center gap-2">
+                            <iconify-icon icon="mdi:book-open-page-variant" class="text-blue-600"></iconify-icon>
+                            Function Point Analysis Glossary
+                        </h2>
+                        <p class="text-sm text-gray-500 mt-1">IFPUG standard terms and definitions for Function Point Analysis</p>
+                    </div>
+                    <div id="glossary-content" class="divide-y divide-gray-100"></div>
+                </div>
+            </div>
+
+            <!-- GSC (General System Characteristics) Tab -->
+            <div id="tab-gsc" class="tab-content hidden">
+                <div class="space-y-6">
+                    <!-- GSC Header -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="font-semibold text-gray-900 flex items-center gap-2 text-lg">
+                                    <iconify-icon icon="mdi:tune-vertical" class="text-blue-600"></iconify-icon>
+                                    14 General System Characteristics (GSC)
+                                </h2>
+                                <p class="text-sm text-gray-500 mt-1">IFPUG standard factors for Value Adjustment Factor (VAF) calculation. Rate each 0-5 based on system influence.</p>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <button onclick="resetGSC()" class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">
+                                    <iconify-icon icon="mdi:refresh"></iconify-icon>
+                                    Reset to Defaults
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- GSC Summary Cards -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                                <div class="text-sm text-blue-600 mb-1">Total Degree of Influence</div>
+                                <div id="gsc-tdi" class="text-2xl font-bold text-blue-700">0</div>
+                                <div class="text-xs text-blue-500">Sum of all 14 ratings (0-70)</div>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                                <div class="text-sm text-purple-600 mb-1">Value Adjustment Factor</div>
+                                <div id="gsc-vaf" class="text-2xl font-bold text-purple-700">1.00</div>
+                                <div class="text-xs text-purple-500">VAF = 0.65 + (0.01 × TDI)</div>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                                <div class="text-sm text-green-600 mb-1">Unadjusted FP (UFP)</div>
+                                <div id="gsc-ufp" class="text-2xl font-bold text-green-700">0</div>
+                                <div class="text-xs text-green-500">Raw function points</div>
+                            </div>
+                            <div class="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                                <div class="text-sm text-orange-600 mb-1">Adjusted FP (AFP)</div>
+                                <div id="gsc-afp" class="text-2xl font-bold text-orange-700">0</div>
+                                <div class="text-xs text-orange-500">AFP = UFP × VAF</div>
+                            </div>
+                        </div>
+
+                        <!-- GSC Sliders Grid -->
+                        <div id="gsc-sliders" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- GSC sliders will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- GSC Rating Guide -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="mdi:information-outline" class="text-blue-600"></iconify-icon>
+                            GSC Rating Guide
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-sm">
+                            <div class="bg-gray-50 rounded-lg p-3 text-center">
+                                <div class="font-bold text-gray-700">0</div>
+                                <div class="text-gray-500 text-xs">Not present / No influence</div>
+                            </div>
+                            <div class="bg-gray-100 rounded-lg p-3 text-center">
+                                <div class="font-bold text-gray-700">1</div>
+                                <div class="text-gray-500 text-xs">Incidental influence</div>
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-3 text-center">
+                                <div class="font-bold text-blue-700">2</div>
+                                <div class="text-blue-500 text-xs">Moderate influence</div>
+                            </div>
+                            <div class="bg-blue-100 rounded-lg p-3 text-center">
+                                <div class="font-bold text-blue-700">3</div>
+                                <div class="text-blue-500 text-xs">Average influence</div>
+                            </div>
+                            <div class="bg-purple-100 rounded-lg p-3 text-center">
+                                <div class="font-bold text-purple-700">4</div>
+                                <div class="text-purple-500 text-xs">Significant influence</div>
+                            </div>
+                            <div class="bg-purple-200 rounded-lg p-3 text-center">
+                                <div class="font-bold text-purple-700">5</div>
+                                <div class="text-purple-500 text-xs">Strong influence throughout</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sticky Footer -->
+        <footer class="bg-gray-800 text-white py-4 mt-auto">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div class="flex items-center gap-2 text-sm">
+                    <iconify-icon icon="mdi:chart-gantt" class="text-blue-400"></iconify-icon>
+                    <span id="footer-title">FP Estimator</span>
+                    <span class="text-gray-500">|</span>
+                    <span id="footer-version" class="text-gray-400">v1.0.0</span>
+                </div>
+                <div class="text-sm text-gray-400">
+                    Generated on <span id="generated-date">-</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let wbsData = null;
+        let expandedProducts = new Set();
+        let expandedFeatures = new Set();
+        
+        // Inclusion state for products, features, and capabilities (for scenario planning)
+        let includedProducts = {};  // { productId: true/false }
+        let includedFeatures = {};  // { featureId: true/false }
+        let includedCapabilities = {};  // { capabilityId: true/false }
+
+        // localStorage key namespace — derived from the active dataset (wbsData.appId)
+        // once data loads, so multiple datasets can be tried in the same browser
+        // profile without clobbering each other's saved state.
+        let dataNamespace = 'fp';
+
+        function nsKey(name) {
+            return dataNamespace + '-' + name;
+        }
+
+        function slugify(text) {
+            return String(text || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        }
+
+        // Status filter state (all enabled by default)
+        let statusFilters = {};
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/data');
+                wbsData = await response.json();
+                dataNamespace = wbsData.appId || slugify(wbsData.metadata?.brandPrefix) || 'fp';
+
+                // Initialize status filters from localStorage
+                initializeStatusFilters();
+
+                initializeUI();
+            } catch (error) {
+                console.error('Failed to load WBS data:', error);
+                document.getElementById('wbs-tree').innerHTML = '<div class="p-8 text-center text-red-600"><iconify-icon icon="mdi:alert-circle" class="text-4xl mb-2"></iconify-icon><p>Failed to load data. Please ensure the server is running and /api/data is reachable.</p></div>';
+            }
+        });
+
+        function initializeUI() {
+            const brandPrefix = wbsData.metadata?.brandPrefix || 'FP';
+            document.getElementById('mainTitle').textContent = brandPrefix + ' Function Point Calculator';
+            document.getElementById('footer-title').textContent = brandPrefix + ' FP Calculator';
+            document.getElementById('footer-version').textContent = 'v' + (wbsData.metadata?.version || '1.0.0');
+            document.getElementById('generated-date').textContent = wbsData.metadata?.generatedDate || new Date().toISOString().split('T')[0];
+            applyStatusLabels();
+
+            if (wbsData.config?.defaultHourlyRate) {
+                document.getElementById('hourlyRate').value = wbsData.config.defaultHourlyRate;
+            }
+
+            document.getElementById('hourlyRate').addEventListener('change', updateStats);
+            document.getElementById('hourlyRate').addEventListener('input', updateStats);
+
+            // Initialize inclusion state for all products and features
+            initializeInclusionState();
+
+            // Render project summary first
+            renderProjectSummary();
+
+            renderStats();
+            renderWBSTree();
+            renderFPTypes();
+            renderProductivityFactors();
+            renderTechFactors();
+            renderTechStack();
+            renderGlossary();
+            initializeGSC();
+            updateToggleButton();
+            syncStatusFilterCheckboxes();
+        }
+
+        // Status legend labels come from the dataset's statusDefinitions (metadata.json),
+        // so a dataset can relabel roadmap/beta/etc. without touching app code.
+        function applyStatusLabels() {
+            const defs = wbsData.statusDefinitions || {};
+            const defaults = {
+                completed: 'Completed', partial: 'Partial', 'in-progress': 'In Progress',
+                roadmap: 'Roadmap', beta: 'Beta'
+            };
+            Object.keys(defaults).forEach(status => {
+                const el = document.getElementById('label-' + status);
+                if (el) el.textContent = defs[status]?.label || defaults[status];
+            });
+        }
+
+        function renderProjectSummary() {
+            const container = document.getElementById('project-summary-content');
+            const summary = wbsData.projectSummary;
+            
+            // If no project summary, show empty state
+            if (!summary) {
+                container.innerHTML = renderEmptyState();
+                return;
+            }
+            
+            // Calculate stats for the summary (respecting inclusion state and visibility)
+            let totalProducts = 0;
+            let totalFeatures = 0;
+            let totalCapabilities = 0;
+            let totalUFP = 0;
+            
+            wbsData.products?.forEach((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                const productKey = 'product-' + pIdx;
+                if (includedProducts[productKey] === false) return;
+                
+                totalProducts++;
+                product.features?.forEach((feature, fIdx) => {
+                    const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                    if (includedFeatures[featureKey] === false) return;
+                    
+                    totalFeatures++;
+                    feature.capabilities?.forEach((cap, cIdx) => {
+                        const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                        if (includedCapabilities[capKey] === false) return;
+                        
+                        totalCapabilities++;
+                        totalUFP += wbsData.fpWeights?.[cap.type]?.[cap.complexity] || 0;
+                    });
+                });
+            });
+            
+            // Build product status counts
+            let productStatusCounts = {};
+            wbsData.products?.forEach(product => {
+                const status = product.status || 'completed';
+                productStatusCounts[status] = (productStatusCounts[status] || 0) + 1;
+            });
+            
+            let html = '';
+            
+            // Hero Section
+            html += `
+                <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl p-8 mb-6 text-white relative overflow-hidden">
+                    <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+                    <div class="relative z-10 text-center">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-2xl mb-4 backdrop-blur-sm">
+                            <iconify-icon icon="${summary.logo || 'mdi:rocket-launch'}" class="text-5xl" style="color: ${summary.logoColor || '#ffffff'}"></iconify-icon>
+                        </div>
+                        <h1 class="text-3xl md:text-4xl font-bold mb-2">${summary.name || wbsData.metadata?.brandPrefix || 'Project'}</h1>
+                        <p class="text-xl text-white/80 mb-6">${summary.tagline || ''}</p>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            ${renderProjectLinks(summary.links)}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Quick Stats Grid
+            html += `
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mb-3">
+                            <iconify-icon icon="mdi:package-variant" class="text-2xl text-blue-600"></iconify-icon>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-900">${totalProducts}</div>
+                        <div class="text-sm text-gray-500">Products</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl mb-3">
+                            <iconify-icon icon="mdi:puzzle" class="text-2xl text-green-600"></iconify-icon>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-900">${totalFeatures}</div>
+                        <div class="text-sm text-gray-500">Features</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-xl mb-3">
+                            <iconify-icon icon="mdi:cog" class="text-2xl text-purple-600"></iconify-icon>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-900">${totalCapabilities}</div>
+                        <div class="text-sm text-gray-500">Capabilities</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-3">
+                            <iconify-icon icon="mdi:function" class="text-2xl text-orange-600"></iconify-icon>
+                        </div>
+                        <div class="text-3xl font-bold text-orange-600">${totalUFP.toLocaleString()}</div>
+                        <div class="text-sm text-gray-500">Function Points (UFP)</div>
+                    </div>
+                </div>
+            `;
+            
+            // Two Column Layout
+            html += `<div class="grid lg:grid-cols-2 gap-6 mb-6">`;
+            
+            // Project Overview Card
+            html += `
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50">
+                        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                            <iconify-icon icon="mdi:information-outline" class="text-blue-600"></iconify-icon>
+                            Project Overview
+                        </h3>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-gray-600 mb-4">${summary.description || 'No description available.'}</p>
+                        ${summary.techStack ? `
+                        <div class="mb-4">
+                            <div class="text-sm font-medium text-gray-500 mb-2">Technology Stack</div>
+                            <div class="flex flex-wrap gap-2">
+                                ${summary.techStack.map(tech => `<span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">${tech}</span>`).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${summary.businessContext?.industry ? `
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <iconify-icon icon="mdi:domain" class="text-gray-400"></iconify-icon>
+                            <span>Industry: <strong class="text-gray-700">${summary.businessContext.industry}</strong></span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Target Users & Value Props
+            html += `
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50">
+                        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                            <iconify-icon icon="mdi:account-group" class="text-green-600"></iconify-icon>
+                            Business Context
+                        </h3>
+                    </div>
+                    <div class="p-5">
+                        ${summary.businessContext?.targetUsers ? `
+                        <div class="mb-4">
+                            <div class="text-sm font-medium text-gray-500 mb-2">Target Users</div>
+                            <ul class="space-y-1">
+                                ${summary.businessContext.targetUsers.map(user => `
+                                    <li class="flex items-center gap-2 text-gray-700">
+                                        <iconify-icon icon="mdi:check-circle" class="text-green-500"></iconify-icon>
+                                        ${user}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                        ${summary.businessContext?.valuePropositions ? `
+                        <div>
+                            <div class="text-sm font-medium text-gray-500 mb-2">Value Propositions</div>
+                            <ul class="space-y-1">
+                                ${summary.businessContext.valuePropositions.map(prop => `
+                                    <li class="flex items-center gap-2 text-gray-700">
+                                        <iconify-icon icon="mdi:star" class="text-yellow-500"></iconify-icon>
+                                        ${prop}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            html += `</div>`; // End two column layout
+            
+            // Key Journeys
+            if (summary.keyJourneys && summary.keyJourneys.length > 0) {
+                html += `
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+                        <div class="p-4 border-b border-gray-100 bg-gray-50">
+                            <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <iconify-icon icon="mdi:map-marker-path" class="text-purple-600"></iconify-icon>
+                                Core User Journeys
+                            </h3>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            ${summary.keyJourneys.map(journey => `
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <iconify-icon icon="${journey.icon || 'mdi:walk'}" class="text-xl text-purple-600"></iconify-icon>
+                                        <span class="font-medium text-gray-800">${journey.name}</span>
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        ${journey.steps.map((step, idx) => `
+                                            <span class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 shadow-sm">${step}</span>
+                                            ${idx < journey.steps.length - 1 ? '<iconify-icon icon="mdi:arrow-right" class="text-gray-400"></iconify-icon>' : ''}
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Products Overview Table
+            html += `
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50">
+                        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                            <iconify-icon icon="mdi:view-list" class="text-blue-600"></iconify-icon>
+                            Products Overview
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Features</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Capabilities</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">UFP</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                ${wbsData.products?.map((product, pIdx) => {
+                                    if (!isProductVisible(pIdx)) return '';
+                                    let pFeatures = product.features?.length || 0;
+                                    let pCaps = 0;
+                                    let pUFP = 0;
+                                    product.features?.forEach(f => {
+                                        f.capabilities?.forEach(c => {
+                                            pCaps++;
+                                            pUFP += wbsData.fpWeights?.[c.type]?.[c.complexity] || 0;
+                                        });
+                                    });
+                                    const statusColors = {
+                                        'completed': 'bg-green-100 text-green-700',
+                                        'partial': 'bg-yellow-100 text-yellow-700',
+                                        'in-progress': 'bg-blue-100 text-blue-700',
+                                        'roadmap': 'bg-purple-100 text-purple-700',
+                                        'beta': 'bg-cyan-100 text-cyan-700'
+                                    };
+                                    const statusColor = statusColors[product.status] || statusColors['completed'];
+                                    return `
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-4 py-3">
+                                                <div class="font-medium text-gray-900">${product.name}</div>
+                                                <div class="text-xs text-gray-500">${product.shortCode || product.id}</div>
+                                            </td>
+                                            <td class="px-4 py-3 text-center text-gray-700">${pFeatures}</td>
+                                            <td class="px-4 py-3 text-center text-gray-700">${pCaps}</td>
+                                            <td class="px-4 py-3 text-center">
+                                                <span class="px-2 py-1 rounded-full text-xs font-medium ${statusColor}">${product.status || 'completed'}</span>
+                                            </td>
+                                            <td class="px-4 py-3 text-right font-medium text-blue-600">${pUFP.toLocaleString()}</td>
+                                        </tr>
+                                    `;
+                                }).join('') || '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No products defined</td></tr>'}
+                            </tbody>
+                            <tfoot class="bg-gray-50 border-t border-gray-200">
+                                <tr>
+                                    <td class="px-4 py-3 font-semibold text-gray-900">Total</td>
+                                    <td class="px-4 py-3 text-center font-semibold text-gray-900">${totalFeatures}</td>
+                                    <td class="px-4 py-3 text-center font-semibold text-gray-900">${totalCapabilities}</td>
+                                    <td class="px-4 py-3"></td>
+                                    <td class="px-4 py-3 text-right font-bold text-blue-600">${totalUFP.toLocaleString()}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function renderProjectLinks(links) {
+            if (!links) return '';
+            
+            const linkConfigs = [
+                { key: 'liveDemo', icon: 'mdi:open-in-new', label: 'Live Demo', color: 'bg-white/20 hover:bg-white/30' },
+                { key: 'figma', icon: 'mdi:figma', label: 'Figma', color: 'bg-white/20 hover:bg-white/30' },
+                { key: 'github', icon: 'mdi:github', label: 'GitHub', color: 'bg-white/20 hover:bg-white/30' },
+                { key: 'documentation', icon: 'mdi:book-open-variant', label: 'Docs', color: 'bg-white/20 hover:bg-white/30' },
+                { key: 'website', icon: 'mdi:web', label: 'Website', color: 'bg-white/20 hover:bg-white/30' }
+            ];
+            
+            return linkConfigs
+                .filter(cfg => links[cfg.key])
+                .map(cfg => `
+                    <a href="${links[cfg.key]}" target="_blank" rel="noopener noreferrer" 
+                       class="inline-flex items-center gap-2 px-4 py-2 ${cfg.color} rounded-lg text-white transition-colors">
+                        <iconify-icon icon="${cfg.icon}"></iconify-icon>
+                        ${cfg.label}
+                    </a>
+                `).join('');
+        }
+        
+        function renderEmptyState() {
+            return `
+                <div class="flex flex-col items-center justify-center min-h-[500px] bg-white rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="text-center max-w-md px-6">
+                        <div class="inline-flex items-center justify-center w-24 h-24 bg-gray-100 rounded-full mb-6">
+                            <iconify-icon icon="mdi:clipboard-text-outline" class="text-6xl text-gray-400"></iconify-icon>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-3">No Project Details Available</h2>
+                        <p class="text-gray-500 mb-6">
+                            Project summary has not been configured for this workspace. 
+                            Add a <code class="bg-gray-100 px-2 py-1 rounded text-sm">projectSummary</code> section 
+                            to your metadata.json to enable this view.
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <button onclick="showTab('wbs')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                <iconify-icon icon="mdi:file-tree"></iconify-icon>
+                                View WBS
+                            </button>
+                            <a href="https://github.com/senthilsweb/ai-dlc-fp-estimation"
+                               target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                                <iconify-icon icon="mdi:book-open-page-variant"></iconify-icon>
+                                Documentation
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initializeInclusionState() {
+            // Load saved state from localStorage
+            const savedProducts = localStorage.getItem(nsKey('included-products'));
+            const savedFeatures = localStorage.getItem(nsKey('included-features'));
+            const savedCapabilities = localStorage.getItem(nsKey('included-capabilities'));
+            
+            if (savedProducts) {
+                includedProducts = JSON.parse(savedProducts);
+            }
+            if (savedFeatures) {
+                includedFeatures = JSON.parse(savedFeatures);
+            }
+            if (savedCapabilities) {
+                includedCapabilities = JSON.parse(savedCapabilities);
+            }
+            
+            // Initialize any new products/features/capabilities as included by default
+            wbsData.products.forEach((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                const productKey = 'product-' + pIdx;
+                if (includedProducts[productKey] === undefined) {
+                    includedProducts[productKey] = true;
+                }
+                product.features?.forEach((feature, fIdx) => {
+                    const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                    if (includedFeatures[featureKey] === undefined) {
+                        includedFeatures[featureKey] = true;
+                    }
+                    feature.capabilities?.forEach((cap, cIdx) => {
+                        const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                        if (includedCapabilities[capKey] === undefined) {
+                            includedCapabilities[capKey] = true;
+                        }
+                    });
+                });
+            });
+        }
+
+        // No access-control tiering in this app — every viewer sees every product.
+        // Kept as a hook so a future config could scope products without touching call sites.
+        function isProductVisible(pIdx) {
+            return true;
+        }
+
+        // Returns true if a capability's status passes the current status filter
+        function isStatusVisible(status) {
+            const s = status || 'completed';
+            return statusFilters[s] !== false;
+        }
+
+        function initializeStatusFilters() {
+            const saved = localStorage.getItem(nsKey('status-filters'));
+            if (saved) {
+                statusFilters = JSON.parse(saved);
+            }
+            // Default: all statuses visible
+            const allStatuses = ['completed', 'partial', 'in-progress', 'roadmap', 'beta'];
+            allStatuses.forEach(s => {
+                if (statusFilters[s] === undefined) statusFilters[s] = true;
+            });
+        }
+
+        function toggleStatusFilter(status) {
+            // Use setTimeout to let the checkbox state update first
+            setTimeout(() => {
+                const checkbox = document.getElementById('filter-' + status);
+                statusFilters[status] = checkbox?.checked ?? true;
+                localStorage.setItem(nsKey('status-filters'), JSON.stringify(statusFilters));
+                renderWBSTree();
+                renderStats();
+            }, 0);
+        }
+
+        function syncStatusFilterCheckboxes() {
+            Object.keys(statusFilters).forEach(s => {
+                const cb = document.getElementById('filter-' + s);
+                if (cb) cb.checked = statusFilters[s] !== false;
+            });
+        }
+
+        function toggleProductInclusion(productKey, event) {
+            event.stopPropagation(); // Prevent expand/collapse
+            includedProducts[productKey] = !includedProducts[productKey];
+            
+            // Also toggle all child features and capabilities when product is toggled
+            const pIdx = parseInt(productKey.replace('product-', ''));
+            wbsData.products[pIdx].features?.forEach((feature, fIdx) => {
+                const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                includedFeatures[featureKey] = includedProducts[productKey];
+                feature.capabilities?.forEach((cap, cIdx) => {
+                    const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                    includedCapabilities[capKey] = includedProducts[productKey];
+                });
+            });
+            
+            localStorage.setItem(nsKey('included-products'), JSON.stringify(includedProducts));
+            localStorage.setItem(nsKey('included-features'), JSON.stringify(includedFeatures));
+            localStorage.setItem(nsKey('included-capabilities'), JSON.stringify(includedCapabilities));
+            renderWBSTree();
+            renderStats(); // Update counts
+        }
+
+        function toggleFeatureInclusion(featureKey, event) {
+            event.stopPropagation(); // Prevent expand/collapse
+            includedFeatures[featureKey] = !includedFeatures[featureKey];
+            
+            // Also toggle all child capabilities when feature is toggled
+            const parts = featureKey.replace('feature-', '').split('-');
+            const pIdx = parseInt(parts[0]);
+            const fIdx = parseInt(parts[1]);
+            wbsData.products[pIdx].features[fIdx].capabilities?.forEach((cap, cIdx) => {
+                const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                includedCapabilities[capKey] = includedFeatures[featureKey];
+            });
+            
+            localStorage.setItem(nsKey('included-features'), JSON.stringify(includedFeatures));
+            localStorage.setItem(nsKey('included-capabilities'), JSON.stringify(includedCapabilities));
+            renderWBSTree();
+            renderStats(); // Update counts
+        }
+
+        function toggleCapabilityInclusion(capKey, event) {
+            event.stopPropagation(); // Prevent expand/collapse
+            includedCapabilities[capKey] = !includedCapabilities[capKey];
+            localStorage.setItem(nsKey('included-capabilities'), JSON.stringify(includedCapabilities));
+            renderWBSTree();
+            renderStats(); // Update counts
+        }
+
+        function resetInclusions() {
+            // Reset all to included
+            setAllInclusions(true);
+        }
+
+        function setAllInclusions(included) {
+            wbsData.products.forEach((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                const productKey = 'product-' + pIdx;
+                includedProducts[productKey] = included;
+                product.features?.forEach((feature, fIdx) => {
+                    const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                    includedFeatures[featureKey] = included;
+                    feature.capabilities?.forEach((cap, cIdx) => {
+                        const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                        includedCapabilities[capKey] = included;
+                    });
+                });
+            });
+            localStorage.setItem(nsKey('included-products'), JSON.stringify(includedProducts));
+            localStorage.setItem(nsKey('included-features'), JSON.stringify(includedFeatures));
+            localStorage.setItem(nsKey('included-capabilities'), JSON.stringify(includedCapabilities));
+            renderWBSTree();
+            renderStats();
+            updateToggleButton();
+        }
+
+        function toggleAllInclusions() {
+            // If any visible item is included, exclude all; otherwise include all
+            const anyIncluded = wbsData.products.some((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return false;
+                return includedProducts['product-' + pIdx] !== false;
+            });
+            setAllInclusions(!anyIncluded);
+        }
+
+        function updateToggleButton() {
+            const btn = document.getElementById('toggleInclusionBtn');
+            if (!btn) return;
+            const anyIncluded = wbsData.products.some((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return false;
+                return includedProducts['product-' + pIdx] !== false;
+            });
+            const icon = btn.querySelector('iconify-icon');
+            const label = btn.querySelector('span');
+            if (anyIncluded) {
+                icon.setAttribute('icon', 'mdi:checkbox-blank-outline');
+                label.textContent = 'Exclude All';
+                btn.className = 'text-sm px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 flex items-center gap-1';
+            } else {
+                icon.setAttribute('icon', 'mdi:checkbox-marked-outline');
+                label.textContent = 'Include All';
+                btn.className = 'text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 flex items-center gap-1';
+            }
+        }
+
+        // GSC (General System Characteristics) definitions with dataset-provided defaults
+        const gscDefinitions = [
+            { id: 1, name: "Data Communications", description: "Degree to which the application communicates with a processor other than its main processor. Includes APIs, web services, network protocols.", default: 4 },
+            { id: 2, name: "Distributed Data Processing", description: "Degree to which data is transferred between components. Includes microservices, message queues, distributed databases.", default: 3 },
+            { id: 3, name: "Performance", description: "User-stated response time or throughput objectives. Critical for real-time applications or high-volume systems.", default: 3 },
+            { id: 4, name: "Heavily Used Configuration", description: "Degree to which current hardware platform restrictions are used. Includes CPU, memory, storage optimization.", default: 2 },
+            { id: 5, name: "Transaction Rate", description: "Rate at which transactions are processed. High for OLTP systems, lower for batch processing.", default: 3 },
+            { id: 6, name: "Online Data Entry", description: "Percentage of information entered online vs batch. Web forms, real-time data capture.", default: 5 },
+            { id: 7, name: "End-User Efficiency", description: "Application designed for end-user efficiency. Navigation aids, help systems, validation, templates.", default: 4 },
+            { id: 8, name: "Online Update", description: "Degree of online update for ILFs. Real-time data modification, concurrent access handling.", default: 5 },
+            { id: 9, name: "Complex Processing", description: "Degree of complex processing. Security, algorithms, exception handling, multi-organization.", default: 4 },
+            { id: 10, name: "Reusability", description: "Degree to which the application is designed for reuse. Component architecture, APIs, libraries.", default: 3 },
+            { id: 11, name: "Installation Ease", description: "Ease of installation and conversion. Automated deployment, migration scripts, documentation.", default: 3 },
+            { id: 12, name: "Operational Ease", description: "Ease of operation. Startup, backup, recovery, error handling, monitoring, logging.", default: 4 },
+            { id: 13, name: "Multiple Sites", description: "Application designed for multiple organizations or sites. Multi-tenancy, localization, configuration.", default: 4 },
+            { id: 14, name: "Facilitate Change", description: "Application designed to facilitate change. Flexibility, parameterization, configurability.", default: 4 }
+        ];
+
+        let gscValues = {};
+
+        function initializeGSC() {
+            // Load from localStorage or use defaults
+            const stored = localStorage.getItem(nsKey('gsc-values'));
+            if (stored) {
+                gscValues = JSON.parse(stored);
+            } else {
+                gscDefinitions.forEach(gsc => {
+                    gscValues[gsc.id] = gsc.default;
+                });
+            }
+            renderGSCSliders();
+            updateGSCCalculations();
+        }
+
+        function renderGSCSliders() {
+            const container = document.getElementById('gsc-sliders');
+            container.innerHTML = gscDefinitions.map(gsc => `
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1">
+                            <label class="font-medium text-gray-800 text-sm">${gsc.id}. ${gsc.name}</label>
+                            <p class="text-xs text-gray-500 mt-1 line-clamp-2">${gsc.description}</p>
+                        </div>
+                        <span id="gsc-value-${gsc.id}" class="text-lg font-bold text-blue-600 ml-3 min-w-[2rem] text-right">${gscValues[gsc.id]}</span>
+                    </div>
+                    <input type="range" id="gsc-slider-${gsc.id}" min="0" max="5" step="1" value="${gscValues[gsc.id]}"
+                           class="gsc-slider w-full" onchange="updateGSCValue(${gsc.id}, this.value)" oninput="updateGSCValue(${gsc.id}, this.value)">
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateGSCValue(id, value) {
+            gscValues[id] = parseInt(value);
+            document.getElementById('gsc-value-' + id).textContent = value;
+            localStorage.setItem(nsKey('gsc-values'), JSON.stringify(gscValues));
+            updateGSCCalculations();
+        }
+
+        function resetGSC() {
+            gscDefinitions.forEach(gsc => {
+                gscValues[gsc.id] = gsc.default;
+                document.getElementById('gsc-slider-' + gsc.id).value = gsc.default;
+                document.getElementById('gsc-value-' + gsc.id).textContent = gsc.default;
+            });
+            localStorage.setItem(nsKey('gsc-values'), JSON.stringify(gscValues));
+            updateGSCCalculations();
+        }
+
+        function updateGSCCalculations() {
+            // Calculate TDI (Total Degree of Influence)
+            const tdi = Object.values(gscValues).reduce((sum, val) => sum + val, 0);
+            
+            // Calculate VAF (Value Adjustment Factor): 0.65 to 1.35
+            const vaf = 0.65 + (0.01 * tdi);
+            
+            // Get UFP from current data (included items only)
+            let ufp = 0;
+            if (wbsData) {
+                wbsData.products.forEach((product, pIdx) => {
+                    if (!isProductVisible(pIdx)) return;
+                    const productKey = 'product-' + pIdx;
+                    if (includedProducts[productKey] === false) return;
+                    
+                    product.features?.forEach((feature, fIdx) => {
+                        const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                        if (includedFeatures[featureKey] === false) return;
+                        
+                        feature.capabilities?.forEach(cap => {
+                            ufp += wbsData.fpWeights?.[cap.type]?.[cap.complexity] || 0;
+                        });
+                    });
+                });
+            }
+            
+            // Calculate AFP (Adjusted Function Points)
+            const afp = Math.round(ufp * vaf);
+            
+            // Update display
+            document.getElementById('gsc-tdi').textContent = tdi;
+            document.getElementById('gsc-vaf').textContent = vaf.toFixed(2);
+            document.getElementById('gsc-ufp').textContent = ufp.toLocaleString();
+            document.getElementById('gsc-afp').textContent = afp.toLocaleString();
+            
+            // Update main stats with AFP values
+            updateStats();
+        }
+
+        // PDF Export placeholder
+        function exportToPDF() {
+            // TODO: Replace with jsPDF for proper multi-page formatted PDF
+            alert('PDF Export: This will open the print dialog. Use "Save as PDF" option.\n\nFuture enhancement will generate a formatted multi-page PDF.');
+            window.print();
+        }
+
+        // Calculate VAF from stored GSC values
+        function getVAF() {
+            const stored = localStorage.getItem(nsKey('gsc-values'));
+            if (stored) {
+                const gscValues = JSON.parse(stored);
+                const tdi = Object.values(gscValues).reduce((sum, val) => sum + val, 0);
+                return 0.65 + (0.01 * tdi);
+            }
+            // Default: use default GSC values
+            const defaultTDI = gscDefinitions.reduce((sum, gsc) => sum + gsc.default, 0);
+            return 0.65 + (0.01 * defaultTDI);
+        }
+
+        function renderStats() {
+            const summary = wbsData.summary;
+            
+            // Count included items
+            let includedProductCount = 0;
+            let includedFeatureCount = 0;
+            let includedCapabilityCount = 0;
+            
+            wbsData.products.forEach((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                const productKey = 'product-' + pIdx;
+                if (includedProducts[productKey] !== false) {
+                    let hasIncludedFeature = false;
+                    product.features?.forEach((feature, fIdx) => {
+                        const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                        if (includedFeatures[featureKey] !== false) {
+                            hasIncludedFeature = true;
+                            includedFeatureCount++;
+                            // Count only included capabilities
+                            feature.capabilities?.forEach((cap, cIdx) => {
+                                const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                                if (includedCapabilities[capKey] !== false) {
+                                    includedCapabilityCount++;
+                                }
+                            });
+                        }
+                    });
+                    if (hasIncludedFeature) {
+                        includedProductCount++;
+                    }
+                }
+            });
+            
+            // Show included/total counts
+            document.getElementById('stat-products').innerHTML = includedProductCount + 
+                (includedProductCount < summary.totalProducts ? '<span class="text-xs text-gray-400 ml-1">/' + summary.totalProducts + '</span>' : '');
+            document.getElementById('stat-features').innerHTML = includedFeatureCount + 
+                (includedFeatureCount < summary.totalFeatures ? '<span class="text-xs text-gray-400 ml-1">/' + summary.totalFeatures + '</span>' : '');
+            document.getElementById('stat-capabilities').innerHTML = includedCapabilityCount + 
+                (includedCapabilityCount < summary.totalCapabilities ? '<span class="text-xs text-gray-400 ml-1">/' + summary.totalCapabilities + '</span>' : '');
+            
+            updateStats();
+            renderSDLCBreakdown();
+
+            Object.entries(summary.statusCounts || {}).forEach(([status, count]) => {
+                const el = document.getElementById('count-' + status);
+                if (el) el.textContent = count;
+            });
+        }
+
+        function updateStats() {
+            // Calculate UFP (Unadjusted Function Points) for INCLUDED and VISIBLE items only
+            let ufp = 0;
+            wbsData.products.forEach((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                const productKey = 'product-' + pIdx;
+                if (includedProducts[productKey] === false) return; // Skip excluded products
+                
+                product.features?.forEach((feature, fIdx) => {
+                    const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                    if (includedFeatures[featureKey] === false) return; // Skip excluded features
+                    
+                    feature.capabilities?.forEach((cap, cIdx) => {
+                        const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                        if (includedCapabilities[capKey] === false) return; // Skip excluded capabilities
+                        
+                        ufp += wbsData.fpWeights?.[cap.type]?.[cap.complexity] || 0;
+                    });
+                });
+            });
+
+            // Get VAF from GSC values
+            const vaf = getVAF();
+            const afp = Math.round(ufp * vaf);
+
+            // Use AFP for effort calculations (industry standard)
+            const pdr = wbsData.config?.defaultPDR || 8; // hours per FP
+            const hours = afp * pdr;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 75;
+            const cost = hours * hourlyRate;
+            
+            // Calculate months (assuming 8 hours/day, 20 days/month = 160 hours/month)
+            const hoursPerMonth = (wbsData.config?.hoursPerDay || 8) * (wbsData.config?.daysPerMonth || 20);
+            const months = (hours / hoursPerMonth).toFixed(1);
+
+            // Update WBS tab display (simplified - only shows UFP)
+            document.getElementById('stat-fp').textContent = ufp.toLocaleString();
+            
+            // Update Effort & Cost tab display
+            const effortUfp = document.getElementById('effort-ufp');
+            const effortAfp = document.getElementById('effort-afp');
+            const effortVaf = document.getElementById('effort-vaf');
+            const effortHours = document.getElementById('effort-hours');
+            const effortMonths = document.getElementById('effort-months');
+            const effortCost = document.getElementById('effort-cost');
+            
+            if (effortUfp) effortUfp.textContent = ufp.toLocaleString();
+            if (effortAfp) effortAfp.textContent = afp.toLocaleString();
+            if (effortVaf) effortVaf.textContent = 'VAF: ' + vaf.toFixed(2);
+            if (effortHours) effortHours.textContent = hours.toLocaleString();
+            if (effortMonths) effortMonths.textContent = months;
+            if (effortCost) effortCost.textContent = '$' + cost.toLocaleString();
+            
+            // Update assumptions display
+            const assumptionPdr = document.getElementById('assumption-pdr');
+            const assumptionRate = document.getElementById('assumption-rate');
+            if (assumptionPdr) assumptionPdr.textContent = pdr;
+            if (assumptionRate) assumptionRate.textContent = '$' + hourlyRate;
+            
+            // Update SDLC breakdown in Effort tab
+            renderSDLCBreakdown(hours, cost);
+            renderCostBreakdown(hours, cost, hourlyRate);
+        }
+
+        function renderCostBreakdown(totalHours, totalCost, hourlyRate) {
+            const container = document.getElementById('cost-breakdown');
+            if (!container) return;
+            
+            const sdlcPhases = wbsData.sdlcPhases || [
+                { id: 'requirements', code: 'REQ', name: 'Requirements', percentage: 10, icon: 'mdi:file-document-edit', color: '#8b5cf6' },
+                { id: 'design', code: 'DGN', name: 'Design', percentage: 15, icon: 'mdi:draw', color: '#3b82f6' },
+                { id: 'development', code: 'DEV', name: 'Development', percentage: 40, icon: 'mdi:code-braces', color: '#22c55e' },
+                { id: 'testing', code: 'TST', name: 'Testing', percentage: 20, icon: 'mdi:test-tube', color: '#f59e0b' },
+                { id: 'deployment', code: 'REL', name: 'Release', percentage: 10, icon: 'mdi:rocket-launch', color: '#ef4444' },
+                { id: 'pm', code: 'PMO', name: 'PM', percentage: 5, icon: 'mdi:account-supervisor', color: '#6b7280' }
+            ];
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Phase</th>
+                                <th class="border border-gray-300 px-4 py-2 text-center">%</th>
+                                <th class="border border-gray-300 px-4 py-2 text-right">Hours</th>
+                                <th class="border border-gray-300 px-4 py-2 text-right">Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sdlcPhases.map(phase => {
+                                const phaseHours = Math.round(totalHours * phase.percentage / 100);
+                                const phaseCost = Math.round(totalCost * phase.percentage / 100);
+                                return `
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2">
+                                            <div class="flex items-center gap-2">
+                                                <iconify-icon icon="${phase.icon}" style="color: ${phase.color}"></iconify-icon>
+                                                <span class="font-medium">${phase.code}</span>
+                                                <span class="text-gray-500 text-xs">${phase.name}</span>
+                                            </div>
+                                        </td>
+                                        <td class="border border-gray-300 px-4 py-2 text-center">
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-bold" style="background: ${phase.color}20; color: ${phase.color}">${phase.percentage}%</span>
+                                        </td>
+                                        <td class="border border-gray-300 px-4 py-2 text-right font-mono">${phaseHours.toLocaleString()}</td>
+                                        <td class="border border-gray-300 px-4 py-2 text-right font-mono text-green-600">$${phaseCost.toLocaleString()}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                            <tr class="bg-gray-50 font-bold">
+                                <td class="border border-gray-300 px-4 py-2" colspan="2">Total</td>
+                                <td class="border border-gray-300 px-4 py-2 text-right font-mono">${totalHours.toLocaleString()}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-right font-mono text-green-600">$${totalCost.toLocaleString()}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderSDLCBreakdown(totalHours, totalCost) {
+            const container = document.getElementById('effort-sdlc-breakdown');
+            if (!container) return;
+            
+            const sdlcPhases = wbsData.sdlcPhases || [
+                { id: 'requirements', code: 'REQ', name: 'Requirements', percentage: 10, icon: 'mdi:file-document-edit', color: '#8b5cf6' },
+                { id: 'design', code: 'DGN', name: 'Design', percentage: 15, icon: 'mdi:draw', color: '#3b82f6' },
+                { id: 'development', code: 'DEV', name: 'Development', percentage: 40, icon: 'mdi:code-braces', color: '#22c55e' },
+                { id: 'testing', code: 'TST', name: 'Testing', percentage: 20, icon: 'mdi:test-tube', color: '#f59e0b' },
+                { id: 'deployment', code: 'REL', name: 'Release', percentage: 10, icon: 'mdi:rocket-launch', color: '#ef4444' },
+                { id: 'pm', code: 'PMO', name: 'PM', percentage: 5, icon: 'mdi:account-supervisor', color: '#6b7280' }
+            ];
+
+            if (!totalHours) {
+                // Calculate if not provided
+                let ufp = 0;
+                wbsData.products.forEach(product => {
+                    product.features?.forEach(feature => {
+                        feature.capabilities?.forEach(cap => {
+                            ufp += wbsData.fpWeights?.[cap.type]?.[cap.complexity] || 0;
+                        });
+                    });
+                });
+                const vaf = getVAF();
+                const afp = Math.round(ufp * vaf);
+                const pdr = wbsData.config?.defaultPDR || 8;
+                totalHours = afp * pdr;
+                const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 75;
+                totalCost = totalHours * hourlyRate;
+            }
+
+            container.innerHTML = sdlcPhases.map(phase => {
+                const phaseHours = Math.round(totalHours * phase.percentage / 100);
+                const phaseCost = Math.round(totalCost * phase.percentage / 100);
+                return `
+                    <div class="rounded-lg p-4 border border-gray-200" style="background: linear-gradient(135deg, ${phase.color}10, white);">
+                        <div class="flex items-center gap-2 mb-2">
+                            <iconify-icon icon="${phase.icon}" style="color: ${phase.color}"></iconify-icon>
+                            <span class="text-sm font-bold text-gray-700">${phase.code}</span>
+                            <span class="ml-auto text-xs font-bold px-2 py-0.5 rounded-full" style="background: ${phase.color}20; color: ${phase.color}">${phase.percentage}%</span>
+                        </div>
+                        <div class="text-xs text-gray-500 mb-1">${phase.name}</div>
+                        <div class="text-lg font-bold text-gray-900">${phaseHours.toLocaleString()} hrs</div>
+                        <div class="text-sm text-green-600 font-medium sdlc-phase-cost">$${phaseCost.toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusCircle(status) {
+            const statusClass = 'status-' + (status || 'completed');
+            return '<span class="status-circle ' + statusClass + '" title="' + (status || 'completed') + '"></span>';
+        }
+
+        function renderWBSTree() {
+            const container = document.getElementById('wbs-tree');
+            let html = '';
+
+            // Count included products
+            let includedCount = 0;
+            let totalCount = 0;
+            wbsData.products.forEach((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                totalCount++;
+                if (includedProducts['product-' + pIdx] !== false) includedCount++;
+            });
+
+            wbsData.products.forEach((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                const productId = 'product-' + pIdx;
+                const isExpanded = expandedProducts.has(productId);
+                const isIncluded = includedProducts[productId] !== false;
+                
+                let productFP = 0;
+                let featureCount = product.features?.length || 0;
+                let capCount = 0;
+                product.features?.forEach((f, fIdx) => {
+                    const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                    const featureIncluded = isIncluded && includedFeatures[featureKey] !== false;
+                    if (featureIncluded) {
+                        f.capabilities?.forEach((c, cIdx) => {
+                            const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                            const capIncluded = includedCapabilities[capKey] !== false;
+                            if (capIncluded) {
+                                capCount++;
+                                productFP += wbsData.fpWeights?.[c.type]?.[c.complexity] || 0;
+                            }
+                        });
+                    }
+                });
+
+                const excludedClass = isIncluded ? '' : 'opacity-40';
+                html += '<div class="tree-item ' + excludedClass + '">';
+                html += '<div class="p-3 cursor-pointer hover:bg-gray-50 flex items-center gap-3">';
+                
+                // Checkbox for inclusion
+                html += '<input type="checkbox" ' + (isIncluded ? 'checked' : '') + ' onclick="toggleProductInclusion(\'' + productId + '\', event)" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" title="Include in calculation">';
+                
+                html += '<div class="flex items-center gap-3 flex-1" onclick="toggleProduct(\'' + productId + '\')">';
+                html += '<iconify-icon icon="' + (isExpanded ? 'mdi:chevron-down' : 'mdi:chevron-right') + '" class="text-gray-400 text-xl"></iconify-icon>';
+                html += '<iconify-icon icon="mdi:package-variant" class="text-blue-600 text-xl"></iconify-icon>';
+                html += '<div class="flex-1">';
+                html += '<div class="font-medium text-gray-900">' + product.name + '</div>';
+                html += '<div class="text-sm text-gray-500">' + (product.shortCode || product.id) + ' • ' + featureCount + ' features • ' + capCount + ' capabilities</div>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="text-right"><div class="text-sm font-medium ' + (isIncluded ? 'text-blue-600' : 'text-gray-400 line-through') + '">' + productFP + ' FP</div></div>';
+                html += '</div>';
+                html += '<div id="' + productId + '" class="' + (isExpanded ? '' : 'hidden') + ' pl-8 bg-gray-50">';
+                html += renderFeatures(product.features, pIdx);
+                html += '</div></div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderFeatures(features, pIdx) {
+            if (!features) return '';
+            let html = '';
+            const productIncluded = includedProducts['product-' + pIdx] !== false;
+
+            features.forEach((feature, fIdx) => {
+                const featureId = 'feature-' + pIdx + '-' + fIdx;
+                const isExpanded = expandedFeatures.has(featureId);
+                const isIncluded = productIncluded && includedFeatures[featureId] !== false;
+                
+                // Calculate FP respecting capability inclusions
+                let featureFP = 0;
+                feature.capabilities?.forEach((c, cIdx) => {
+                    const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                    const capIncluded = includedCapabilities[capKey] !== false;
+                    if (capIncluded) {
+                        featureFP += wbsData.fpWeights?.[c.type]?.[c.complexity] || 0;
+                    }
+                });
+
+                const excludedClass = isIncluded ? '' : 'opacity-40';
+                html += '<div class="border-l-2 border-gray-200 ' + excludedClass + '">';
+                html += '<div class="p-2 cursor-pointer hover:bg-white flex items-center gap-3">';
+                
+                // Checkbox for feature inclusion
+                html += '<input type="checkbox" ' + (isIncluded ? 'checked' : '') + ' onclick="toggleFeatureInclusion(\'' + featureId + '\', event)" class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer" title="Include in calculation" ' + (productIncluded ? '' : 'disabled') + '>';
+                
+                html += '<div class="flex items-center gap-3 flex-1" onclick="toggleFeature(\'' + featureId + '\')">';
+                html += '<iconify-icon icon="' + (isExpanded ? 'mdi:chevron-down' : 'mdi:chevron-right') + '" class="text-gray-400"></iconify-icon>';
+                html += '<iconify-icon icon="mdi:puzzle" class="text-purple-600"></iconify-icon>';
+                html += '<div class="flex-1">';
+                html += '<span class="font-medium text-gray-800">' + feature.name + '</span>';
+                html += '<span class="text-sm text-gray-500 ml-2">' + (feature.capabilities?.length || 0) + ' capabilities</span>';
+                html += '</div>';
+                html += '</div>';
+                html += '<span class="text-sm font-medium ' + (isIncluded ? 'text-purple-600' : 'text-gray-400 line-through') + '">' + featureFP + ' FP</span>';
+                html += '</div>';
+                html += '<div id="' + featureId + '" class="' + (isExpanded ? '' : 'hidden') + ' pl-8">';
+                html += renderCapabilities(feature.capabilities, pIdx, fIdx, isIncluded);
+                html += '</div></div>';
+            });
+
+            return html;
+        }
+
+        function renderCapabilities(capabilities, pIdx, fIdx, parentIncluded = true) {
+            if (!capabilities) return '';
+            let html = '<div class="py-1 space-y-1">';
+
+            const fpTypeColors = {
+                'EI': 'bg-blue-600 text-white',
+                'EO': 'bg-green-600 text-white',
+                'EQ': 'bg-purple-600 text-white',
+                'ILF': 'bg-orange-600 text-white',
+                'EIF': 'bg-pink-600 text-white'
+            };
+
+            const complexityColors = {
+                'L': 'bg-gray-200 text-gray-700',
+                'A': 'bg-gray-300 text-gray-700',
+                'H': 'bg-gray-500 text-white'
+            };
+
+            capabilities.forEach((cap, cIdx) => {
+                if (!isStatusVisible(cap.status)) return; // Skip by status filter
+                const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                const isIncluded = parentIncluded && includedCapabilities[capKey] !== false;
+                const fp = wbsData.fpWeights?.[cap.type]?.[cap.complexity] || 0;
+                const fpColor = fpTypeColors[cap.type] || 'bg-blue-100 text-blue-700';
+                const compColor = complexityColors[cap.complexity] || 'bg-gray-100 text-gray-600';
+                const excludedClass = isIncluded ? '' : 'opacity-40';
+                
+                html += '<div class="flex items-center gap-3 p-2 rounded hover:bg-white ' + excludedClass + '">';
+                
+                // Checkbox for capability inclusion
+                html += '<input type="checkbox" ' + (isIncluded ? 'checked' : '') + ' onclick="toggleCapabilityInclusion(\'' + capKey + '\', event)" class="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer" title="Include in calculation" ' + (parentIncluded ? '' : 'disabled') + '>';
+                
+                html += getStatusCircle(cap.status);
+                html += '<iconify-icon icon="mdi:cog" class="text-gray-400"></iconify-icon>';
+                html += '<span class="flex-1 text-sm text-gray-700">' + cap.name + '</span>';
+                html += '<span class="text-xs font-bold px-2 py-0.5 rounded ' + fpColor + '">' + cap.type + '</span>';
+                html += '<span class="text-xs font-medium px-2 py-0.5 rounded ' + compColor + '">' + cap.complexity + '</span>';
+                html += '<span class="text-sm font-bold ' + (isIncluded ? 'text-blue-600' : 'text-gray-400 line-through') + '">' + fp + ' FP</span>';
+                html += '</div>';
+            });
+
+            return html + '</div>';
+        }
+
+        function toggleProduct(id) {
+            if (expandedProducts.has(id)) {
+                expandedProducts.delete(id);
+            } else {
+                expandedProducts.add(id);
+            }
+            renderWBSTree();
+        }
+
+        function toggleFeature(id) {
+            if (expandedFeatures.has(id)) {
+                expandedFeatures.delete(id);
+            } else {
+                expandedFeatures.add(id);
+            }
+            renderWBSTree();
+        }
+
+        function expandAll() {
+            wbsData.products.forEach((p, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                expandedProducts.add('product-' + pIdx);
+                p.features?.forEach((f, fIdx) => {
+                    expandedFeatures.add('feature-' + pIdx + '-' + fIdx);
+                });
+            });
+            renderWBSTree();
+        }
+
+        function collapseAll() {
+            expandedProducts.clear();
+            expandedFeatures.clear();
+            renderWBSTree();
+        }
+
+        function renderFPTypes() {
+            const container = document.getElementById('fp-types-table');
+            const weights = wbsData.fpWeights;
+            
+            let html = '<table class="w-full text-sm"><thead><tr class="text-left text-gray-500 border-b">';
+            html += '<th class="pb-2">Type</th><th class="pb-2">Name</th><th class="pb-2 text-center">Low</th><th class="pb-2 text-center">Avg</th><th class="pb-2 text-center">High</th>';
+            html += '</tr></thead><tbody class="divide-y divide-gray-100">';
+
+            Object.entries(weights || {}).forEach(([type, data]) => {
+                html += '<tr class="hover:bg-gray-50">';
+                html += '<td class="py-2 font-mono font-medium text-blue-600">' + type + '</td>';
+                html += '<td class="py-2 text-gray-700">' + (data.name || type) + '</td>';
+                html += '<td class="py-2 text-center">' + data.L + '</td>';
+                html += '<td class="py-2 text-center">' + data.A + '</td>';
+                html += '<td class="py-2 text-center">' + data.H + '</td>';
+                html += '</tr>';
+            });
+
+            container.innerHTML = html + '</tbody></table>';
+        }
+
+        function renderProductivityFactors() {
+            const container = document.getElementById('productivity-factors');
+            const factors = wbsData.productivityFactors;
+            
+            let html = '';
+            Object.entries(factors || {}).forEach(([key, data]) => {
+                const color = data.factor < 1 ? 'text-green-600' : 'text-orange-600';
+                html += '<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">';
+                html += '<div><div class="font-medium text-gray-800">' + data.label + '</div>';
+                html += '<div class="text-sm text-gray-500">' + (data.description || '') + '</div></div>';
+                html += '<div class="text-lg font-bold ' + color + '">' + data.factor + 'x</div></div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderTechFactors() {
+            const container = document.getElementById('tech-factors');
+            const factors = wbsData.techStackFactors;
+            
+            let html = '';
+            Object.entries(factors || {}).forEach(([key, data]) => {
+                html += '<div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">';
+                html += '<iconify-icon icon="' + (data.icon || 'mdi:code-braces') + '" class="text-2xl text-purple-600"></iconify-icon>';
+                html += '<div class="flex-1"><div class="font-medium text-gray-800">' + data.label + '</div></div>';
+                html += '<div class="text-lg font-bold text-purple-600">' + data.factor + 'x</div></div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderTechStack() {
+            const container = document.getElementById('techstack-content');
+            const techStack = wbsData.techStack;
+            
+            if (!techStack) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-8">Tech stack data not available</div>';
+                return;
+            }
+
+            let html = '';
+            
+            if (wbsData.techStackSummary) {
+                const summary = wbsData.techStackSummary;
+                html += '<div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-6">';
+                html += '<h3 class="text-lg font-semibold mb-4 flex items-center gap-2"><iconify-icon icon="mdi:layers-triple"></iconify-icon>Technology Stack Overview</h3>';
+                html += '<div class="grid md:grid-cols-3 gap-4">';
+                html += '<div><div class="text-blue-200 text-sm mb-1">Languages</div><div class="flex flex-wrap gap-1">';
+                (summary.languages || []).forEach(l => { html += '<span class="text-xs bg-white/20 px-2 py-1 rounded">' + l + '</span>'; });
+                html += '</div></div>';
+                html += '<div><div class="text-blue-200 text-sm mb-1">Databases</div><div class="flex flex-wrap gap-1">';
+                (summary.databases || []).forEach(d => { html += '<span class="text-xs bg-white/20 px-2 py-1 rounded">' + d + '</span>'; });
+                html += '</div></div>';
+                html += '<div><div class="text-blue-200 text-sm mb-1">Platforms</div><div class="flex flex-wrap gap-1">';
+                (summary.platforms || []).forEach(p => { html += '<span class="text-xs bg-white/20 px-2 py-1 rounded">' + p + '</span>'; });
+                html += '</div></div></div>';
+                html += '<div class="mt-4 pt-4 border-t border-white/20"><div class="text-sm text-blue-200">Primary Stack</div>';
+                html += '<div class="font-mono text-sm">' + (summary.primaryStack || '') + '</div></div></div>';
+            }
+
+            Object.entries(techStack).forEach(([productId, product]) => {
+                html += '<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">';
+                html += '<div class="p-4 border-b border-gray-200 flex items-center gap-3">';
+                html += '<iconify-icon icon="mdi:package-variant" class="text-xl text-blue-600"></iconify-icon>';
+                html += '<div><h3 class="font-semibold text-gray-900">' + product.name + '</h3>';
+                html += '<p class="text-sm text-gray-500">' + product.shortCode + ' • ' + product.repository + '</p></div></div>';
+                html += '<div class="p-4 grid md:grid-cols-2 lg:grid-cols-3 gap-4">';
+
+                Object.entries(product.categories || {}).forEach(([catKey, category]) => {
+                    html += '<div class="bg-gray-50 rounded-lg p-3">';
+                    html += '<div class="flex items-center gap-2 mb-3 text-gray-700 font-medium">';
+                    html += '<iconify-icon icon="' + (category.icon || 'mdi:folder') + '" class="text-lg"></iconify-icon>' + category.label + '</div>';
+                    html += '<div class="space-y-2">';
+                    (category.technologies || []).forEach(tech => {
+                        html += '<div class="flex items-center gap-2 text-sm">';
+                        html += '<iconify-icon icon="' + (tech.icon || 'mdi:code-tags') + '" class="text-lg"></iconify-icon>';
+                        html += '<span class="flex-1">' + tech.name + '</span>';
+                        html += '<span class="text-xs text-gray-500">' + tech.version + '</span></div>';
+                    });
+                    html += '</div></div>';
+                });
+
+                html += '</div></div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderGlossary() {
+            const container = document.getElementById('glossary-content');
+            const glossary = wbsData.glossary;
+            
+            if (!glossary || glossary.length === 0) {
+                container.innerHTML = '<div class="p-8 text-center text-gray-500">No glossary terms available</div>';
+                return;
+            }
+
+            let html = '';
+            glossary.forEach(item => {
+                html += '<div class="p-4 hover:bg-gray-50">';
+                html += '<div class="flex items-start gap-4">';
+                html += '<div class="min-w-[80px]"><span class="font-mono font-bold text-blue-600 text-lg">' + item.term + '</span></div>';
+                html += '<div class="flex-1">';
+                html += '<div class="font-medium text-gray-900 mb-1">' + item.fullName + '</div>';
+                html += '<p class="text-gray-600 text-sm mb-2">' + item.definition + '</p>';
+                if (item.formula && !item.formula.startsWith('N/A')) {
+                    html += '<div class="mt-2 bg-gray-100 px-3 py-2 rounded font-mono text-sm text-gray-700">';
+                    html += '<iconify-icon icon="mdi:function" class="text-purple-600 mr-1"></iconify-icon>' + item.formula + '</div>';
+                }
+                html += '</div></div></div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('tab-active');
+                el.classList.add('text-gray-600');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.querySelector('[data-tab="' + tabId + '"]').classList.add('tab-active');
+            document.querySelector('[data-tab="' + tabId + '"]').classList.remove('text-gray-600');
+        }
+
+        function exportToExcel() {
+            const rows = [['Product', 'Feature', 'Capability', 'FP Type', 'Complexity', 'FP Value', 'Status', 'Included']];
+            
+            wbsData.products.forEach((product, pIdx) => {
+                if (!isProductVisible(pIdx)) return;
+                const productKey = 'product-' + pIdx;
+                const productIncluded = includedProducts[productKey] !== false;
+                
+                product.features?.forEach((feature, fIdx) => {
+                    const featureKey = 'feature-' + pIdx + '-' + fIdx;
+                    const featureIncluded = productIncluded && includedFeatures[featureKey] !== false;
+                    
+                    feature.capabilities?.forEach((cap, cIdx) => {
+                        const capKey = 'capability-' + pIdx + '-' + fIdx + '-' + cIdx;
+                        const capIncluded = featureIncluded && includedCapabilities[capKey] !== false;
+                        const fp = wbsData.fpWeights?.[cap.type]?.[cap.complexity] || 0;
+                        rows.push([product.name, feature.name, cap.name, cap.type, cap.complexity, fp, cap.status || 'completed', capIncluded ? 'Yes' : 'No']);
+                    });
+                });
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'WBS');
+            ws['!cols'] = [{ wch: 25 }, { wch: 30 }, { wch: 40 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 10 }];
+            XLSX.writeFile(wb, (wbsData.metadata?.brandPrefix || 'FP').replace(/\s+/g, '-') + '-WBS-' + new Date().toISOString().split('T')[0] + '.xlsx');
+        }
+    </script>
+</body>
+</html>

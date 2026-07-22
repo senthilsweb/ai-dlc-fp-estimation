@@ -1,0 +1,81 @@
+{
+  "id": "P3",
+  "name": "Tripma Admin Portal",
+  "shortCode": "TRIPMA-ADMIN",
+  "description": "Backend administration portal for flight inventory, booking management, and operations",
+  "technology": "Next.js, React, TypeScript, Tailwind CSS, PostgreSQL",
+  "techStackFactor": "admin",
+  "status": "roadmap",
+  "features": [
+    {
+      "id": "P3-F1",
+      "name": "Admin Authentication",
+      "description": "Secure admin login with 2FA and role-based access",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P3-F1-C1", "name": "Admin Login", "type": "EI", "complexity": "A", "description": "Secure admin login with email/password", "status": "roadmap" },
+        { "id": "P3-F1-C2", "name": "Two-Factor Authentication", "type": "EI", "complexity": "H", "description": "TOTP-based 2FA for admin accounts", "status": "roadmap" },
+        { "id": "P3-F1-C3", "name": "Admin Role Management", "type": "EI", "complexity": "A", "description": "Assign roles and permissions to admins", "status": "roadmap" },
+        { "id": "P3-F1-C4", "name": "Admin User List", "type": "EQ", "complexity": "A", "description": "View all admin users", "status": "roadmap" },
+        { "id": "P3-F1-C5", "name": "Admin Users Data Store", "type": "ILF", "complexity": "A", "description": "Admin accounts and roles storage", "status": "roadmap" }
+      ]
+    },
+    {
+      "id": "P3-F2",
+      "name": "Flight Inventory Management",
+      "description": "Manage flight schedules, routes, and availability",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P3-F2-C1", "name": "Flight List View", "type": "EQ", "complexity": "A", "description": "Browse all flights with search and filter", "status": "roadmap" },
+        { "id": "P3-F2-C2", "name": "Add New Flight", "type": "EI", "complexity": "H", "description": "Create new flight schedule", "status": "roadmap" },
+        { "id": "P3-F2-C3", "name": "Edit Flight Details", "type": "EI", "complexity": "A", "description": "Modify flight information", "status": "roadmap" },
+        { "id": "P3-F2-C4", "name": "Cancel Flight", "type": "EI", "complexity": "A", "description": "Cancel flight and notify passengers", "status": "roadmap" },
+        { "id": "P3-F2-C5", "name": "Seat Inventory Update", "type": "EI", "complexity": "A", "description": "Adjust available seats and classes", "status": "roadmap" },
+        { "id": "P3-F2-C6", "name": "Pricing Management", "type": "EI", "complexity": "H", "description": "Set and update fare prices", "status": "roadmap" },
+        { "id": "P3-F2-C7", "name": "Schedule Import (Bulk)", "type": "EI", "complexity": "H", "description": "Import flight schedules from CSV/API", "status": "roadmap" },
+        { "id": "P3-F2-C8", "name": "Flights Data Store", "type": "ILF", "complexity": "H", "description": "Flight inventory database", "status": "roadmap" }
+      ]
+    },
+    {
+      "id": "P3-F3",
+      "name": "Booking Management",
+      "description": "View, modify, and process customer bookings",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P3-F3-C1", "name": "Booking Search", "type": "EQ", "complexity": "A", "description": "Search bookings by PNR, name, email", "status": "roadmap" },
+        { "id": "P3-F3-C2", "name": "Booking Detail View", "type": "EQ", "complexity": "A", "description": "View full booking details", "status": "roadmap" },
+        { "id": "P3-F3-C3", "name": "Modify Booking (Admin)", "type": "EI", "complexity": "H", "description": "Change flight, seats, passengers", "status": "roadmap" },
+        { "id": "P3-F3-C4", "name": "Process Refund", "type": "EI", "complexity": "H", "description": "Initiate and process refunds", "status": "roadmap" },
+        { "id": "P3-F3-C5", "name": "Resend Confirmation", "type": "EO", "complexity": "L", "description": "Resend booking confirmation email", "status": "roadmap" },
+        { "id": "P3-F3-C6", "name": "Booking Notes", "type": "EI", "complexity": "L", "description": "Add internal notes to booking", "status": "roadmap" }
+      ]
+    },
+    {
+      "id": "P3-F4",
+      "name": "Customer Support Tools",
+      "description": "Tools for customer service representatives",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P3-F4-C1", "name": "Customer Lookup", "type": "EQ", "complexity": "A", "description": "Search customers by name, email, phone", "status": "roadmap" },
+        { "id": "P3-F4-C2", "name": "Customer Booking History", "type": "EQ", "complexity": "A", "description": "View all bookings for a customer", "status": "roadmap" },
+        { "id": "P3-F4-C3", "name": "Support Ticket View", "type": "EQ", "complexity": "A", "description": "View customer support tickets", "status": "roadmap" },
+        { "id": "P3-F4-C4", "name": "Escalation Workflow", "type": "EI", "complexity": "A", "description": "Escalate issues to supervisor", "status": "roadmap" },
+        { "id": "P3-F4-C5", "name": "Support Tickets Data", "type": "ILF", "complexity": "A", "description": "Customer support ticket storage", "status": "roadmap" }
+      ]
+    },
+    {
+      "id": "P3-F5",
+      "name": "Reports & Analytics",
+      "description": "Business intelligence and operational reports",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P3-F5-C1", "name": "Revenue Dashboard", "type": "EO", "complexity": "H", "description": "Revenue metrics and trends", "status": "roadmap" },
+        { "id": "P3-F5-C2", "name": "Occupancy Report", "type": "EO", "complexity": "A", "description": "Flight occupancy and load factors", "status": "roadmap" },
+        { "id": "P3-F5-C3", "name": "Booking Trends", "type": "EO", "complexity": "A", "description": "Booking volume over time", "status": "roadmap" },
+        { "id": "P3-F5-C4", "name": "Popular Routes", "type": "EO", "complexity": "A", "description": "Top routes by bookings and revenue", "status": "roadmap" },
+        { "id": "P3-F5-C5", "name": "Report Export", "type": "EO", "complexity": "A", "description": "Export reports to CSV/PDF", "status": "roadmap" },
+        { "id": "P3-F5-C6", "name": "Analytics Data Store", "type": "ILF", "complexity": "H", "description": "Aggregated analytics data", "status": "roadmap" }
+      ]
+    }
+  ]
+}

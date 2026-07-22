@@ -1,0 +1,77 @@
+{
+  "id": "P4",
+  "name": "Tripma Hotel Booking",
+  "shortCode": "TRIPMA-HOTELS",
+  "description": "Hotel search, booking, and package deals module integrated with flight booking",
+  "technology": "Next.js, React, TypeScript, Tailwind CSS",
+  "techStackFactor": "web",
+  "status": "roadmap",
+  "features": [
+    {
+      "id": "P4-F1",
+      "name": "Hotel Search",
+      "description": "Search hotels by location, dates, and guest count",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P4-F1-C1", "name": "Hotel Search Form", "type": "EI", "complexity": "A", "description": "Search by city, check-in/out dates, guests", "status": "roadmap" },
+        { "id": "P4-F1-C2", "name": "Location Autocomplete", "type": "EQ", "complexity": "A", "description": "Type-ahead city/hotel name search", "status": "roadmap" },
+        { "id": "P4-F1-C3", "name": "Date Range Picker", "type": "EI", "complexity": "A", "description": "Check-in and check-out date selection", "status": "roadmap" },
+        { "id": "P4-F1-C4", "name": "Guest/Room Selector", "type": "EI", "complexity": "A", "description": "Number of rooms, adults, children", "status": "roadmap" },
+        { "id": "P4-F1-C5", "name": "Near Airport Search", "type": "EQ", "complexity": "A", "description": "Hotels near selected airport/flight destination", "status": "roadmap" },
+        { "id": "P4-F1-C6", "name": "Hotels Reference Data", "type": "EIF", "complexity": "H", "description": "External hotel inventory and availability API", "status": "roadmap" }
+      ]
+    },
+    {
+      "id": "P4-F2",
+      "name": "Hotel Listing & Filters",
+      "description": "Display hotel search results with advanced filtering",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P4-F2-C1", "name": "Hotel Results List", "type": "EQ", "complexity": "H", "description": "Display matching hotels with photos and prices", "status": "roadmap" },
+        { "id": "P4-F2-C2", "name": "Filter by Price Range", "type": "EI", "complexity": "L", "description": "Slider-based price filter", "status": "roadmap" },
+        { "id": "P4-F2-C3", "name": "Filter by Star Rating", "type": "EI", "complexity": "L", "description": "Filter by 3/4/5 star hotels", "status": "roadmap" },
+        { "id": "P4-F2-C4", "name": "Filter by Amenities", "type": "EI", "complexity": "A", "description": "WiFi, pool, gym, parking filters", "status": "roadmap" },
+        { "id": "P4-F2-C5", "name": "Sort Options", "type": "EI", "complexity": "L", "description": "Sort by price, rating, distance", "status": "roadmap" }
+      ]
+    },
+    {
+      "id": "P4-F3",
+      "name": "Hotel Detail & Room Selection",
+      "description": "View hotel details and select room type",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P4-F3-C1", "name": "Hotel Detail Page", "type": "EQ", "complexity": "H", "description": "Full hotel info, photos, amenities, map", "status": "roadmap" },
+        { "id": "P4-F3-C2", "name": "Photo Gallery", "type": "EQ", "complexity": "A", "description": "Image carousel with zoom", "status": "roadmap" },
+        { "id": "P4-F3-C3", "name": "Room Types List", "type": "EQ", "complexity": "A", "description": "Available room types with pricing", "status": "roadmap" },
+        { "id": "P4-F3-C4", "name": "Room Selection", "type": "EI", "complexity": "A", "description": "Select room type and quantity", "status": "roadmap" },
+        { "id": "P4-F3-C5", "name": "Guest Reviews", "type": "EQ", "complexity": "A", "description": "Display customer reviews and ratings", "status": "roadmap" }
+      ]
+    },
+    {
+      "id": "P4-F4",
+      "name": "Hotel Booking & Payment",
+      "description": "Complete hotel booking with payment",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P4-F4-C1", "name": "Guest Details Form", "type": "EI", "complexity": "A", "description": "Guest name, contact, special requests", "status": "roadmap" },
+        { "id": "P4-F4-C2", "name": "Price Summary", "type": "EO", "complexity": "A", "description": "Itemized price with taxes and fees", "status": "roadmap" },
+        { "id": "P4-F4-C3", "name": "Hotel Payment", "type": "EI", "complexity": "H", "description": "Payment processing for hotel booking", "status": "roadmap" },
+        { "id": "P4-F4-C4", "name": "Hotel Confirmation", "type": "EO", "complexity": "A", "description": "Booking confirmation with voucher", "status": "roadmap" },
+        { "id": "P4-F4-C5", "name": "Email Voucher", "type": "EO", "complexity": "A", "description": "Send hotel voucher via email", "status": "roadmap" },
+        { "id": "P4-F4-C6", "name": "Hotel Bookings Data", "type": "ILF", "complexity": "H", "description": "Hotel reservation records", "status": "roadmap" }
+      ]
+    },
+    {
+      "id": "P4-F5",
+      "name": "Package Deals (Flight + Hotel)",
+      "description": "Bundle flight and hotel for discounted pricing",
+      "status": "roadmap",
+      "capabilities": [
+        { "id": "P4-F5-C1", "name": "Package Search", "type": "EI", "complexity": "H", "description": "Combined flight + hotel search", "status": "roadmap" },
+        { "id": "P4-F5-C2", "name": "Package Results", "type": "EQ", "complexity": "H", "description": "Display bundled packages with savings", "status": "roadmap" },
+        { "id": "P4-F5-C3", "name": "Package Price Calculation", "type": "EO", "complexity": "H", "description": "Calculate bundle discount", "status": "roadmap" },
+        { "id": "P4-F5-C4", "name": "Package Booking", "type": "EI", "complexity": "H", "description": "Book flight and hotel together", "status": "roadmap" }
+      ]
+    }
+  ]
+}

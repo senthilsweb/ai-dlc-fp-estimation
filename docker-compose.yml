@@ -1,0 +1,18 @@
+services:
+  fp-estimator:
+    image: fp-estimator:latest
+    container_name: fp-estimator
+    restart: unless-stopped
+    ports:
+      - "${FP_PORT:-8080}:${FP_PORT:-8080}"
+    environment:
+      FP_PORT: "${FP_PORT:-8080}"
+      FP_APP: "${FP_APP:-ai-agents-provly}"
+      FP_LOG_LEVEL: "${FP_LOG_LEVEL:-info}"
+      FP_LOG_FORMAT: json
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${FP_PORT:-8080}/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

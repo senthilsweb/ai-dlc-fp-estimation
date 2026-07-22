@@ -1,0 +1,288 @@
+{
+  "version": "1.0.0",
+  "createdDate": "2026-01-04",
+  "lastUpdated": "2026-01-04",
+  "description": "Comprehensive WBS and Function Point Analysis for Tripma Flight Booking Platform",
+
+  "projectSummary": {
+    "logo": "mdi:airplane-takeoff",
+    "logoColor": "#3b82f6",
+    "name": "Tripma",
+    "tagline": "Book flights with confidence",
+    "description": "Tripma is a complete flight booking platform originally designed by Figma's Product Education team as an educational resource. It demonstrates modern design patterns including Auto Layout, Variants, and Interactive Components. The platform enables users to search flights, compare options, select seats, and complete bookings with a seamless user experience.",
+    "techStack": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Vercel"],
+    "businessContext": {
+      "industry": "Travel & Hospitality",
+      "targetUsers": [
+        "Leisure Travelers",
+        "Business Travelers",
+        "Travel Agents",
+        "Corporate Travel Managers"
+      ],
+      "valuePropositions": [
+        "One-click flight booking",
+        "Real-time seat selection",
+        "Best price guarantee",
+        "Seamless mobile experience",
+        "Secure payment processing"
+      ]
+    },
+    "links": {
+      "liveDemo": "https://trimpa-flights.vercel.app/",
+      "figma": "https://www.figma.com/community/file/911320742349428744",
+      "github": "https://github.com/PrtHub/Tripma",
+      "alternateDemo": "https://tripma-pink.vercel.app/"
+    },
+    "keyJourneys": [
+      {
+        "name": "Book a Flight",
+        "icon": "mdi:airplane",
+        "steps": ["Search Flights", "Select Flight", "Choose Seats", "Enter Details", "Pay", "Confirm"]
+      },
+      {
+        "name": "Manage Booking",
+        "icon": "mdi:ticket-confirmation",
+        "steps": ["View My Trips", "Select Booking", "Modify or Cancel", "Confirm Changes"]
+      },
+      {
+        "name": "Book a Hotel",
+        "icon": "mdi:bed",
+        "steps": ["Search Hotels", "View Details", "Select Room", "Pay", "Confirm"]
+      }
+    ]
+  },
+
+  "projectConfig": {
+    "title": "Tripma Work Breakdown Structure",
+    "mainProductName": "Tripma Flight Booking Platform",
+    "brandPrefix": "TRIPMA",
+    "organization": "Figma Product Education",
+    "defaultHourlyRate": 75,
+    "currency": "USD",
+    "hoursPerDay": 8,
+    "daysPerMonth": 20,
+    "levels": {
+      "1": "Product",
+      "2": "Feature",
+      "3": "Capability"
+    },
+    "products": [
+      {
+        "id": "P1",
+        "name": "Tripma Web Application",
+        "shortCode": "TRIPMA-WEB",
+        "description": "Full-featured flight booking web application built with Next.js and React",
+        "dataFile": "p1-tripma-web.json"
+      },
+      {
+        "id": "P2",
+        "name": "Tripma Mobile App",
+        "shortCode": "TRIPMA-MOBILE",
+        "description": "Responsive PWA mobile companion app for on-the-go booking",
+        "dataFile": "p2-tripma-mobile.json"
+      },
+      {
+        "id": "P3",
+        "name": "Tripma Admin Portal",
+        "shortCode": "TRIPMA-ADMIN",
+        "description": "Backend administration portal for flight and booking management",
+        "dataFile": "p3-tripma-admin.json"
+      },
+      {
+        "id": "P4",
+        "name": "Tripma Hotel Booking",
+        "shortCode": "TRIPMA-HOTELS",
+        "description": "Hotel search, booking, and package deals module",
+        "dataFile": "p4-tripma-hotels.json"
+      }
+    ]
+  },
+
+  "fpConfig": {
+    "methodology": "IFPUG CPM 4.3.1",
+    "fpWeights": {
+      "EI": { "L": 3, "A": 4, "H": 6, "name": "External Input", "description": "An elementary process that processes data or control information from outside the application boundary.", "examples": ["Flight search form", "Passenger details entry", "Payment form submission"] },
+      "EO": { "L": 4, "A": 5, "H": 7, "name": "External Output", "description": "An elementary process that generates data or control information sent outside the application boundary.", "examples": ["Booking confirmation PDF", "Email itinerary", "Price comparison report"] },
+      "EQ": { "L": 3, "A": 4, "H": 6, "name": "External Inquiry", "description": "An elementary process that retrieves data from ILF/EIF without calculations or derived data.", "examples": ["Flight search results", "Seat availability check", "Booking details view"] },
+      "ILF": { "L": 7, "A": 10, "H": 15, "name": "Internal Logical File", "description": "A user-identifiable group of logically related data maintained within the application boundary.", "examples": ["Bookings table", "User profiles", "Payment records"] },
+      "EIF": { "L": 5, "A": 7, "H": 10, "name": "External Interface File", "description": "A user-identifiable group of logically related data referenced but not maintained by the application.", "examples": ["Airline schedules API", "Airport codes reference", "Currency exchange rates"] }
+    },
+    "complexityGuidelines": {
+      "L": { "label": "Low", "dataElements": "1-5 DETs", "recordTypes": "0-1 RETs/FTRs", "description": "Simple function with minimal data elements" },
+      "A": { "label": "Average", "dataElements": "6-19 DETs", "recordTypes": "2 RETs/FTRs", "description": "Moderate complexity with multiple data elements" },
+      "H": { "label": "High", "dataElements": "20+ DETs", "recordTypes": "3+ RETs/FTRs", "description": "Complex function with many data elements and relationships" }
+    },
+    "gscDefinitions": [
+      { "id": 1, "name": "Data Communications", "description": "Degree to which the application communicates with external systems", "default": 5 },
+      { "id": 2, "name": "Distributed Data Processing", "description": "Degree to which data is transferred between components", "default": 3 },
+      { "id": 3, "name": "Performance", "description": "User-stated response time or throughput objectives", "default": 4 },
+      { "id": 4, "name": "Heavily Used Configuration", "description": "Degree to which hardware restrictions influence the application", "default": 2 },
+      { "id": 5, "name": "Transaction Rate", "description": "Rate at which transactions are processed", "default": 4 },
+      { "id": 6, "name": "Online Data Entry", "description": "Percentage of information entered online", "default": 5 },
+      { "id": 7, "name": "End-User Efficiency", "description": "Design emphasis on end-user efficiency", "default": 5 },
+      { "id": 8, "name": "Online Update", "description": "Degree of online update for ILFs", "default": 4 },
+      { "id": 9, "name": "Complex Processing", "description": "Degree of complex processing logic", "default": 3 },
+      { "id": 10, "name": "Reusability", "description": "Degree to which application is designed for reuse", "default": 4 },
+      { "id": 11, "name": "Installation Ease", "description": "Ease of installation and conversion", "default": 4 },
+      { "id": 12, "name": "Operational Ease", "description": "Ease of operation and minimal intervention", "default": 4 },
+      { "id": 13, "name": "Multiple Sites", "description": "Application designed for multiple sites/organizations", "default": 3 },
+      { "id": 14, "name": "Facilitate Change", "description": "Application designed to facilitate change", "default": 4 }
+    ],
+    "gscRatingGuide": {
+      "0": "Not present / No influence",
+      "1": "Incidental influence",
+      "2": "Moderate influence",
+      "3": "Average influence",
+      "4": "Significant influence",
+      "5": "Strong influence throughout"
+    }
+  },
+
+  "effortConfig": {
+    "techStackFactors": {
+      "web": { "factor": 1.0, "label": "Web Application (Next.js)", "icon": "mdi:web" },
+      "mobile": { "factor": 1.2, "label": "Mobile/PWA", "icon": "mdi:cellphone" },
+      "api": { "factor": 1.1, "label": "API Integration", "icon": "mdi:api" },
+      "payments": { "factor": 1.3, "label": "Payment Processing", "icon": "mdi:credit-card" },
+      "admin": { "factor": 1.0, "label": "Admin Portal", "icon": "mdi:shield-account" }
+    },
+    "productivityFactors": {
+      "aiCopilot": { "factor": 0.65, "label": "AI Copilot Assisted", "description": "35% reduction with GitHub Copilot/Claude" },
+      "experiencedTeam": { "factor": 0.80, "label": "Experienced Team", "description": "20% reduction with domain expertise" },
+      "newTeam": { "factor": 1.20, "label": "New Team Members", "description": "20% increase for learning curve" },
+      "componentReuse": { "factor": 0.70, "label": "Component Reuse", "description": "30% reduction with existing components" },
+      "prototyping": { "factor": 0.50, "label": "Rapid Prototyping", "description": "50% reduction for POC/demos" }
+    },
+    "sdlcPhases": [
+      { "id": "requirements", "code": "REQ", "name": "Requirements & Analysis", "percentage": 10, "icon": "mdi:file-document-edit", "color": "#8b5cf6", "description": "Business analysis, user stories, acceptance criteria" },
+      { "id": "design", "code": "DGN", "name": "Design & Architecture", "percentage": 15, "icon": "mdi:draw", "color": "#3b82f6", "description": "UI/UX design, system design, API specifications" },
+      { "id": "development", "code": "DEV", "name": "Development & Coding", "percentage": 40, "icon": "mdi:code-braces", "color": "#22c55e", "description": "Implementation, unit testing, code reviews" },
+      { "id": "testing", "code": "TST", "name": "Testing & QA", "percentage": 20, "icon": "mdi:test-tube", "color": "#f59e0b", "description": "Integration testing, UAT, performance testing" },
+      { "id": "release", "code": "REL", "name": "Deployment & Release", "percentage": 10, "icon": "mdi:rocket-launch", "color": "#ef4444", "description": "CI/CD, staging, production deployment" },
+      { "id": "pmo", "code": "PMO", "name": "Project Management", "percentage": 5, "icon": "mdi:account-supervisor", "color": "#6b7280", "description": "Planning, coordination, stakeholder management" }
+    ],
+    "defaultPDR": 8,
+    "pdrDescription": "Productivity Delivery Rate - hours per function point"
+  },
+
+  "statusDefinitions": {
+    "completed": {
+      "label": "Completed",
+      "color": "#22c55e",
+      "bgColor": "#dcfce7",
+      "icon": "circle-full",
+      "description": "Feature is fully implemented and production-ready"
+    },
+    "partial": {
+      "label": "Partial",
+      "color": "#eab308",
+      "bgColor": "#fef9c3",
+      "icon": "circle-half",
+      "description": "Feature is partially implemented"
+    },
+    "in-progress": {
+      "label": "In Progress",
+      "color": "#3b82f6",
+      "bgColor": "#dbeafe",
+      "icon": "circle-progress",
+      "description": "Currently being developed"
+    },
+    "roadmap": {
+      "label": "Roadmap",
+      "color": "#8b5cf6",
+      "bgColor": "#ede9fe",
+      "icon": "circle-outline",
+      "description": "Planned for future development"
+    },
+    "beta": {
+      "label": "Beta",
+      "color": "#06b6d4",
+      "bgColor": "#cffafe",
+      "icon": "circle-beta",
+      "description": "In beta testing phase"
+    },
+    "deprecated": {
+      "label": "Deprecated",
+      "color": "#ef4444",
+      "bgColor": "#fee2e2",
+      "icon": "circle-x",
+      "description": "Scheduled for removal"
+    },
+    "onhold": {
+      "label": "On Hold",
+      "color": "#6b7280",
+      "bgColor": "#f3f4f6",
+      "icon": "circle-pause",
+      "description": "Development paused"
+    }
+  },
+
+  "glossary": [
+    {
+      "term": "PNR",
+      "fullName": "Passenger Name Record",
+      "definition": "A record in a database that contains the itinerary for a passenger or group of passengers traveling together.",
+      "formula": "N/A"
+    },
+    {
+      "term": "GDS",
+      "fullName": "Global Distribution System",
+      "definition": "A computerized network system owned or operated by a company enabling transactions between travel industry service providers.",
+      "formula": "N/A"
+    },
+    {
+      "term": "OTA",
+      "fullName": "Online Travel Agency",
+      "definition": "A web-based marketplace that allows consumers to research and book travel products and services directly.",
+      "formula": "N/A"
+    },
+    {
+      "term": "UFP",
+      "fullName": "Unadjusted Function Points",
+      "definition": "The raw count of function points before applying any adjustment factors.",
+      "formula": "UFP = Σ(EI×w) + Σ(EO×w) + Σ(EQ×w) + Σ(ILF×w) + Σ(EIF×w)"
+    },
+    {
+      "term": "AFP",
+      "fullName": "Adjusted Function Points",
+      "definition": "Function points after applying Value Adjustment Factor based on 14 General System Characteristics.",
+      "formula": "AFP = UFP × VAF, where VAF = 0.65 + (0.01 × TDI)"
+    },
+    {
+      "term": "VAF",
+      "fullName": "Value Adjustment Factor",
+      "definition": "A multiplier (0.65 to 1.35) derived from 14 General System Characteristics.",
+      "formula": "VAF = 0.65 + (0.01 × Σ GSC ratings)"
+    },
+    {
+      "term": "EI",
+      "fullName": "External Input",
+      "definition": "An elementary process that processes data entering from outside the application boundary.",
+      "formula": "Complexity based on DETs and FTRs"
+    },
+    {
+      "term": "EO",
+      "fullName": "External Output",
+      "definition": "An elementary process that generates data sent outside the application boundary with processing logic.",
+      "formula": "Complexity based on DETs and FTRs"
+    },
+    {
+      "term": "EQ",
+      "fullName": "External Inquiry",
+      "definition": "An elementary process that retrieves data without derived calculations.",
+      "formula": "Complexity based on DETs and FTRs"
+    },
+    {
+      "term": "ILF",
+      "fullName": "Internal Logical File",
+      "definition": "A user-identifiable group of logically related data maintained within the application.",
+      "formula": "Complexity based on DETs and RETs"
+    },
+    {
+      "term": "EIF",
+      "fullName": "External Interface File",
+      "definition": "A user-identifiable group of logically related data referenced but not maintained by the application.",
+      "formula": "Complexity based on DETs and RETs"
+    }
+  ]
+}

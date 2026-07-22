@@ -1,0 +1,131 @@
+{
+  "title": "Technology Stack by Product",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-18",
+  "products": {
+    "P1": {
+      "name": "Tripma Web Application",
+      "shortCode": "TRIPMA-WEB",
+      "repository": "tripma-web",
+      "categories": {
+        "frontend": {
+          "label": "Frontend Framework",
+          "icon": "mdi:monitor",
+          "technologies": [
+            { "name": "Next.js", "version": "14.x", "icon": "logos:nextjs-icon", "category": "Framework" },
+            { "name": "React", "version": "18.x", "icon": "logos:react", "category": "Library" },
+            { "name": "TypeScript", "version": "5.x", "icon": "logos:typescript-icon", "category": "Language" }
+          ]
+        },
+        "styling": {
+          "label": "Styling & UI",
+          "icon": "mdi:palette",
+          "technologies": [
+            { "name": "Tailwind CSS", "version": "3.x", "icon": "logos:tailwindcss-icon", "category": "Styling" },
+            { "name": "Radix UI", "version": "latest", "icon": "simple-icons:radixui", "category": "Components" },
+            { "name": "Framer Motion", "version": "10.x", "icon": "logos:framer", "category": "Animation" }
+          ]
+        },
+        "stateData": {
+          "label": "State & Data",
+          "icon": "mdi:database-sync",
+          "technologies": [
+            { "name": "React Query", "version": "5.x", "icon": "logos:react-query-icon", "category": "Server State" },
+            { "name": "Zustand", "version": "4.x", "icon": "simple-icons:zustand", "category": "Client State" },
+            { "name": "React Hook Form", "version": "7.x", "icon": "simple-icons:reacthookform", "category": "Forms" }
+          ]
+        },
+        "deployment": {
+          "label": "Deployment",
+          "icon": "mdi:cloud-upload",
+          "technologies": [
+            { "name": "Vercel", "version": "latest", "icon": "logos:vercel-icon", "category": "Hosting" },
+            { "name": "GitHub Actions", "version": "latest", "icon": "logos:github-actions", "category": "CI/CD" }
+          ]
+        }
+      }
+    },
+    "P2": {
+      "name": "Tripma Mobile Application",
+      "shortCode": "TRIPMA-MOBILE",
+      "repository": "tripma-mobile",
+      "categories": {
+        "framework": {
+          "label": "Mobile Framework",
+          "icon": "mdi:cellphone",
+          "technologies": [
+            { "name": "React", "version": "18.x", "icon": "logos:react", "category": "Library" },
+            { "name": "Capacitor", "version": "5.x", "icon": "logos:capacitorjs-icon", "category": "Native Bridge" },
+            { "name": "TypeScript", "version": "5.x", "icon": "logos:typescript-icon", "category": "Language" }
+          ]
+        },
+        "mobile": {
+          "label": "Mobile Features",
+          "icon": "mdi:feature-search",
+          "technologies": [
+            { "name": "Push Notifications", "version": "FCM", "icon": "mdi:bell-ring", "category": "Messaging" },
+            { "name": "Biometric Auth", "version": "native", "icon": "mdi:fingerprint", "category": "Security" },
+            { "name": "Apple Wallet", "version": "native", "icon": "logos:apple", "category": "Integration" },
+            { "name": "Google Pay", "version": "latest", "icon": "logos:google-pay", "category": "Payments" }
+          ]
+        }
+      }
+    },
+    "P3": {
+      "name": "Tripma Admin Portal",
+      "shortCode": "TRIPMA-ADMIN",
+      "repository": "tripma-admin",
+      "categories": {
+        "frontend": {
+          "label": "Frontend",
+          "icon": "mdi:monitor",
+          "technologies": [
+            { "name": "Next.js", "version": "14.x", "icon": "logos:nextjs-icon", "category": "Framework" },
+            { "name": "Tailwind CSS", "version": "3.x", "icon": "logos:tailwindcss-icon", "category": "Styling" },
+            { "name": "Recharts", "version": "2.x", "icon": "simple-icons:chartdotjs", "category": "Charts" }
+          ]
+        },
+        "backend": {
+          "label": "Backend",
+          "icon": "mdi:server",
+          "technologies": [
+            { "name": "Node.js", "version": "20.x", "icon": "logos:nodejs-icon", "category": "Runtime" },
+            { "name": "PostgreSQL", "version": "15+", "icon": "logos:postgresql", "category": "Database" },
+            { "name": "Prisma", "version": "5.x", "icon": "simple-icons:prisma", "category": "ORM" }
+          ]
+        }
+      }
+    },
+    "P4": {
+      "name": "Tripma Hotel Booking",
+      "shortCode": "TRIPMA-HOTELS",
+      "repository": "tripma-hotels",
+      "categories": {
+        "integrations": {
+          "label": "Integrations",
+          "icon": "mdi:api",
+          "technologies": [
+            { "name": "Amadeus API", "version": "v2", "icon": "mdi:api", "category": "Hotel API" },
+            { "name": "Google Maps", "version": "latest", "icon": "logos:google-maps", "category": "Location" },
+            { "name": "Stripe", "version": "latest", "icon": "logos:stripe", "category": "Payments" }
+          ]
+        },
+        "frontend": {
+          "label": "Frontend",
+          "icon": "mdi:monitor",
+          "technologies": [
+            { "name": "Next.js", "version": "14.x", "icon": "logos:nextjs-icon", "category": "Framework" },
+            { "name": "React", "version": "18.x", "icon": "logos:react", "category": "Library" },
+            { "name": "TypeScript", "version": "5.x", "icon": "logos:typescript-icon", "category": "Language" }
+          ]
+        }
+      }
+    }
+  },
+  "summary": {
+    "languages": ["TypeScript", "JavaScript", "SQL"],
+    "databases": ["PostgreSQL"],
+    "platforms": ["Web", "iOS", "Android"],
+    "primaryStack": "Next.js 14 + React 18 + TypeScript + Tailwind CSS + Vercel"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "id": "P2",
+  "name": "Tripma Mobile App",
+  "shortCode": "TRIPMA-MOBILE",
+  "description": "Responsive PWA mobile companion app for on-the-go flight booking and trip management",
+  "technology": "React, TypeScript, Tailwind CSS, PWA, Capacitor",
+  "techStackFactor": "mobile",
+  "status": "completed",
+  "features": [
+    {
+      "id": "P2-F1",
+      "name": "Mobile Authentication",
+      "description": "Mobile-optimized authentication with biometric support",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P2-F1-C1", "name": "Mobile Login", "type": "EI", "complexity": "L", "description": "Touch-optimized login form", "status": "completed" },
+        { "id": "P2-F1-C2", "name": "Biometric Auth (Face ID)", "type": "EI", "complexity": "A", "description": "Face ID authentication on iOS", "status": "completed" },
+        { "id": "P2-F1-C3", "name": "Biometric Auth (Fingerprint)", "type": "EI", "complexity": "A", "description": "Fingerprint authentication on Android", "status": "completed" },
+        { "id": "P2-F1-C4", "name": "Social Login (Google)", "type": "EI", "complexity": "A", "description": "Google OAuth with native SDK", "status": "completed" },
+        { "id": "P2-F1-C5", "name": "Remember Me / Auto-login", "type": "EI", "complexity": "L", "description": "Secure token-based auto-login", "status": "completed" },
+        { "id": "P2-F1-C6", "name": "Session Tokens Data", "type": "ILF", "complexity": "L", "description": "Secure local storage for auth tokens", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P2-F2",
+      "name": "Mobile Flight Search",
+      "description": "Touch-optimized flight search experience",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P2-F2-C1", "name": "Mobile Search Widget", "type": "EI", "complexity": "H", "description": "Compact search form for small screens", "status": "completed" },
+        { "id": "P2-F2-C2", "name": "Recent Searches", "type": "EQ", "complexity": "L", "description": "Quick access to recent searches", "status": "completed" },
+        { "id": "P2-F2-C3", "name": "Voice Search", "type": "EI", "complexity": "A", "description": "Voice input for destination search", "status": "completed" },
+        { "id": "P2-F2-C4", "name": "Swipe Date Selection", "type": "EI", "complexity": "A", "description": "Gesture-based date picker", "status": "completed" },
+        { "id": "P2-F2-C5", "name": "Location-based Suggestions", "type": "EQ", "complexity": "A", "description": "Nearby airport detection", "status": "completed" },
+        { "id": "P2-F2-C6", "name": "Flight Results (Mobile)", "type": "EQ", "complexity": "H", "description": "Scrollable results with pull-to-refresh", "status": "completed" },
+        { "id": "P2-F2-C7", "name": "Quick Filters", "type": "EI", "complexity": "A", "description": "Chip-based quick filter options", "status": "completed" },
+        { "id": "P2-F2-C8", "name": "Search History Data", "type": "ILF", "complexity": "L", "description": "Local storage of search history", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P2-F3",
+      "name": "Mobile Booking Flow",
+      "description": "Streamlined mobile booking experience",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P2-F3-C1", "name": "Flight Selection (Mobile)", "type": "EI", "complexity": "A", "description": "Touch-friendly flight card selection", "status": "completed" },
+        { "id": "P2-F3-C2", "name": "Passenger Form (Mobile)", "type": "EI", "complexity": "H", "description": "Multi-step passenger info wizard", "status": "completed" },
+        { "id": "P2-F3-C3", "name": "Autofill from Contacts", "type": "EQ", "complexity": "A", "description": "Import passenger info from contacts", "status": "completed" },
+        { "id": "P2-F3-C4", "name": "Apple Pay Payment", "type": "EI", "complexity": "H", "description": "Native Apple Pay integration", "status": "completed" },
+        { "id": "P2-F3-C5", "name": "Google Pay Payment", "type": "EI", "complexity": "H", "description": "Native Google Pay integration", "status": "completed" },
+        { "id": "P2-F3-C6", "name": "Card Scanner", "type": "EI", "complexity": "A", "description": "Camera-based credit card scanning", "status": "completed" },
+        { "id": "P2-F3-C7", "name": "Booking Progress Indicator", "type": "EO", "complexity": "L", "description": "Step-by-step progress visualization", "status": "completed" },
+        { "id": "P2-F3-C8", "name": "Booking Confirmation (Mobile)", "type": "EO", "complexity": "A", "description": "Mobile-optimized confirmation screen", "status": "completed" },
+        { "id": "P2-F3-C9", "name": "Share Itinerary", "type": "EO", "complexity": "L", "description": "Native share sheet for itinerary", "status": "completed" },
+        { "id": "P2-F3-C10", "name": "Saved Cards Data", "type": "ILF", "complexity": "A", "description": "Secure tokenized payment methods", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P2-F4",
+      "name": "Mobile Seat Selection",
+      "description": "Touch-friendly seat picker with pinch-zoom",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P2-F4-C1", "name": "Zoomable Seat Map", "type": "EQ", "complexity": "H", "description": "Pinch-to-zoom aircraft seat layout", "status": "completed" },
+        { "id": "P2-F4-C2", "name": "Seat Tap Selection", "type": "EI", "complexity": "A", "description": "Tap to select/deselect seats", "status": "completed" },
+        { "id": "P2-F4-C3", "name": "Seat Legend", "type": "EQ", "complexity": "L", "description": "Color-coded seat category legend", "status": "completed" },
+        { "id": "P2-F4-C4", "name": "Seat Upgrade Prompt", "type": "EO", "complexity": "A", "description": "Upsell premium seat options", "status": "completed" },
+        { "id": "P2-F4-C5", "name": "Seat Preferences Saved", "type": "ILF", "complexity": "L", "description": "Remember seat preferences (aisle/window)", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P2-F5",
+      "name": "Push Notifications",
+      "description": "Real-time flight alerts and booking updates",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P2-F5-C1", "name": "Flight Status Alerts", "type": "EO", "complexity": "A", "description": "Push notification for flight delays/changes", "status": "completed" },
+        { "id": "P2-F5-C2", "name": "Check-in Reminder", "type": "EO", "complexity": "L", "description": "24-hour check-in reminder", "status": "completed" },
+        { "id": "P2-F5-C3", "name": "Gate Change Alert", "type": "EO", "complexity": "L", "description": "Notification for gate changes", "status": "completed" },
+        { "id": "P2-F5-C4", "name": "Notification Preferences", "type": "EI", "complexity": "A", "description": "Configure notification settings", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P2-F6",
+      "name": "Offline Boarding Pass",
+      "description": "Downloadable boarding pass for offline access",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P2-F6-C1", "name": "Boarding Pass Display", "type": "EQ", "complexity": "A", "description": "Full-screen boarding pass with barcode", "status": "completed" },
+        { "id": "P2-F6-C2", "name": "Add to Apple Wallet", "type": "EO", "complexity": "A", "description": "Save boarding pass to Apple Wallet", "status": "completed" },
+        { "id": "P2-F6-C3", "name": "Add to Google Pay", "type": "EO", "complexity": "A", "description": "Save boarding pass to Google Pay", "status": "completed" },
+        { "id": "P2-F6-C4", "name": "Offline Storage", "type": "ILF", "complexity": "A", "description": "Cache boarding pass for offline access", "status": "completed" }
+      ]
+    }
+  ]
+}

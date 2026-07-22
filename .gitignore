@@ -1,0 +1,6 @@
+fp-estimator
+fp-estimator-linux-amd64
+fp-estimator-darwin-arm64
+.env
+.DS_Store
+*.log

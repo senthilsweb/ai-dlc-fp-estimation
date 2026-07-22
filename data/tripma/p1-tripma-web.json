@@ -1,0 +1,158 @@
+{
+  "id": "P1",
+  "name": "Tripma Web Application",
+  "shortCode": "TRIPMA-WEB",
+  "description": "Full-featured flight booking web application built with Next.js, React, TypeScript, and Tailwind CSS",
+  "technology": "Next.js, React, TypeScript, Tailwind CSS",
+  "techStackFactor": "web",
+  "status": "completed",
+  "features": [
+    {
+      "id": "P1-F1",
+      "name": "Authentication & User Account",
+      "description": "User authentication, registration, and profile management",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F1-C1", "name": "User Login", "type": "EI", "complexity": "L", "description": "Email/password login form with validation", "status": "completed" },
+        { "id": "P1-F1-C2", "name": "User Registration", "type": "EI", "complexity": "A", "description": "New user signup with email verification", "status": "completed" },
+        { "id": "P1-F1-C3", "name": "Forgot Password", "type": "EI", "complexity": "L", "description": "Password reset via email link", "status": "completed" },
+        { "id": "P1-F1-C4", "name": "Social Auth (Google)", "type": "EI", "complexity": "A", "description": "OAuth login with Google account", "status": "completed" },
+        { "id": "P1-F1-C5", "name": "Social Auth (Facebook)", "type": "EI", "complexity": "A", "description": "OAuth login with Facebook account", "status": "completed" },
+        { "id": "P1-F1-C6", "name": "User Profile View", "type": "EQ", "complexity": "A", "description": "View user profile information", "status": "completed" },
+        { "id": "P1-F1-C7", "name": "User Profile Update", "type": "EI", "complexity": "A", "description": "Edit user profile and preferences", "status": "completed" },
+        { "id": "P1-F1-C8", "name": "Users Data Store", "type": "ILF", "complexity": "A", "description": "User accounts and credentials storage", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F2",
+      "name": "Flight Search & Discovery",
+      "description": "Search flights with advanced filtering and destination discovery",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F2-C1", "name": "Flight Search Form", "type": "EI", "complexity": "H", "description": "Search widget with origin, destination, dates, passengers, class", "status": "completed" },
+        { "id": "P1-F2-C2", "name": "Airport Autocomplete", "type": "EQ", "complexity": "A", "description": "Type-ahead airport/city search", "status": "completed" },
+        { "id": "P1-F2-C3", "name": "Date Picker (Departure)", "type": "EI", "complexity": "L", "description": "Calendar date selector for departure", "status": "completed" },
+        { "id": "P1-F2-C4", "name": "Date Picker (Return)", "type": "EI", "complexity": "L", "description": "Calendar date selector for return flight", "status": "completed" },
+        { "id": "P1-F2-C5", "name": "Passenger Selector", "type": "EI", "complexity": "A", "description": "Adults, children, infants counter", "status": "completed" },
+        { "id": "P1-F2-C6", "name": "Travel Class Selection", "type": "EI", "complexity": "L", "description": "Economy, Business, First class options", "status": "completed" },
+        { "id": "P1-F2-C7", "name": "Trip Type Toggle", "type": "EI", "complexity": "L", "description": "One-way vs Round-trip selection", "status": "completed" },
+        { "id": "P1-F2-C8", "name": "Popular Destinations", "type": "EQ", "complexity": "A", "description": "Display trending destination cards", "status": "completed" },
+        { "id": "P1-F2-C9", "name": "Flight Deals Carousel", "type": "EQ", "complexity": "A", "description": "Promotional flight deals display", "status": "completed" },
+        { "id": "P1-F2-C10", "name": "Airports Reference", "type": "EIF", "complexity": "A", "description": "External airport codes and names reference", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F3",
+      "name": "Flight Selection & Comparison",
+      "description": "Flight search results, filtering, sorting, and comparison",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F3-C1", "name": "Flight Results List", "type": "EQ", "complexity": "H", "description": "Display matching flights with details", "status": "completed" },
+        { "id": "P1-F3-C2", "name": "Flight Filter (Stops)", "type": "EI", "complexity": "L", "description": "Filter by non-stop, 1 stop, 2+ stops", "status": "completed" },
+        { "id": "P1-F3-C3", "name": "Flight Filter (Airlines)", "type": "EI", "complexity": "A", "description": "Filter by airline carriers", "status": "completed" },
+        { "id": "P1-F3-C4", "name": "Flight Filter (Times)", "type": "EI", "complexity": "A", "description": "Filter by departure/arrival time ranges", "status": "completed" },
+        { "id": "P1-F3-C5", "name": "Flight Sort Options", "type": "EI", "complexity": "L", "description": "Sort by price, duration, departure time", "status": "completed" },
+        { "id": "P1-F3-C6", "name": "Flight Detail View", "type": "EQ", "complexity": "A", "description": "Expanded flight details and amenities", "status": "completed" },
+        { "id": "P1-F3-C7", "name": "Fare Class Comparison", "type": "EO", "complexity": "A", "description": "Compare Economy, Premium, Business fares", "status": "completed" },
+        { "id": "P1-F3-C8", "name": "Flight Schedules Reference", "type": "EIF", "complexity": "H", "description": "External airline schedules data", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F4",
+      "name": "Seat Selection",
+      "description": "Interactive seat map for seat selection and upgrades",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F4-C1", "name": "Seat Map Display", "type": "EQ", "complexity": "H", "description": "Interactive aircraft seat layout", "status": "completed" },
+        { "id": "P1-F4-C2", "name": "Seat Availability Check", "type": "EQ", "complexity": "A", "description": "Real-time seat availability status", "status": "completed" },
+        { "id": "P1-F4-C3", "name": "Seat Selection", "type": "EI", "complexity": "A", "description": "Select seat from available options", "status": "completed" },
+        { "id": "P1-F4-C4", "name": "Seat Category Pricing", "type": "EO", "complexity": "A", "description": "Display pricing by seat category (standard, extra legroom, exit row)", "status": "completed" },
+        { "id": "P1-F4-C5", "name": "Multi-Passenger Seats", "type": "EI", "complexity": "A", "description": "Assign seats to multiple passengers", "status": "completed" },
+        { "id": "P1-F4-C6", "name": "Seat Selection Summary", "type": "EO", "complexity": "L", "description": "Summary of selected seats and costs", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F5",
+      "name": "Passenger Information",
+      "description": "Collect passenger details required for booking",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F5-C1", "name": "Passenger Details Form", "type": "EI", "complexity": "H", "description": "Name, DOB, gender, passport info", "status": "completed" },
+        { "id": "P1-F5-C2", "name": "Contact Information", "type": "EI", "complexity": "A", "description": "Email, phone for booking confirmation", "status": "completed" },
+        { "id": "P1-F5-C3", "name": "Add Additional Passenger", "type": "EI", "complexity": "A", "description": "Add multiple passengers to booking", "status": "completed" },
+        { "id": "P1-F5-C4", "name": "TSA PreCheck / Known Traveler", "type": "EI", "complexity": "L", "description": "Optional KTN/Redress number entry", "status": "completed" },
+        { "id": "P1-F5-C5", "name": "Passenger Data Validation", "type": "EI", "complexity": "A", "description": "Validate passenger info before payment", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F6",
+      "name": "Payment Processing",
+      "description": "Secure payment collection and processing",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F6-C1", "name": "Payment Method Selection", "type": "EI", "complexity": "A", "description": "Credit card, debit card, PayPal options", "status": "completed" },
+        { "id": "P1-F6-C2", "name": "Credit Card Form", "type": "EI", "complexity": "H", "description": "Secure card number, expiry, CVV entry", "status": "completed" },
+        { "id": "P1-F6-C3", "name": "Billing Address", "type": "EI", "complexity": "A", "description": "Billing address form with validation", "status": "completed" },
+        { "id": "P1-F6-C4", "name": "Promo Code Entry", "type": "EI", "complexity": "L", "description": "Apply promotional discount codes", "status": "completed" },
+        { "id": "P1-F6-C5", "name": "Promo Code Validation", "type": "EQ", "complexity": "A", "description": "Validate and apply discount", "status": "completed" },
+        { "id": "P1-F6-C6", "name": "Price Summary", "type": "EO", "complexity": "A", "description": "Itemized price breakdown with taxes", "status": "completed" },
+        { "id": "P1-F6-C7", "name": "Payment Processing", "type": "EI", "complexity": "H", "description": "Submit payment to payment gateway", "status": "completed" },
+        { "id": "P1-F6-C8", "name": "Payments Data Store", "type": "ILF", "complexity": "H", "description": "Payment transactions and records", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F7",
+      "name": "Booking Confirmation",
+      "description": "Booking confirmation and itinerary delivery",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F7-C1", "name": "Confirmation Page", "type": "EO", "complexity": "A", "description": "Booking success with confirmation number", "status": "completed" },
+        { "id": "P1-F7-C2", "name": "Email Confirmation", "type": "EO", "complexity": "A", "description": "Send booking details via email", "status": "completed" },
+        { "id": "P1-F7-C3", "name": "Itinerary PDF Generation", "type": "EO", "complexity": "H", "description": "Generate downloadable PDF itinerary", "status": "completed" },
+        { "id": "P1-F7-C4", "name": "Add to Calendar", "type": "EO", "complexity": "L", "description": "Export to Google/Apple calendar", "status": "completed" },
+        { "id": "P1-F7-C5", "name": "Bookings Data Store", "type": "ILF", "complexity": "H", "description": "Booking records and itineraries", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F8",
+      "name": "My Bookings / Trip Management",
+      "description": "View, manage, modify, and cancel bookings",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F8-C1", "name": "My Trips List", "type": "EQ", "complexity": "A", "description": "View all upcoming and past bookings", "status": "completed" },
+        { "id": "P1-F8-C2", "name": "Booking Detail View", "type": "EQ", "complexity": "A", "description": "View full booking details", "status": "completed" },
+        { "id": "P1-F8-C3", "name": "Modify Booking", "type": "EI", "complexity": "H", "description": "Change dates, passengers, or flights", "status": "completed" },
+        { "id": "P1-F8-C4", "name": "Cancel Booking", "type": "EI", "complexity": "A", "description": "Cancel booking with refund processing", "status": "completed" },
+        { "id": "P1-F8-C5", "name": "Check-in Online", "type": "EI", "complexity": "A", "description": "Web check-in for flights", "status": "completed" },
+        { "id": "P1-F8-C6", "name": "Boarding Pass Download", "type": "EO", "complexity": "A", "description": "Download mobile boarding pass", "status": "completed" },
+        { "id": "P1-F8-C7", "name": "Flight Status Check", "type": "EQ", "complexity": "A", "description": "Real-time flight status updates", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F9",
+      "name": "Deals & Promotions",
+      "description": "Promotional content, deals, and special offers",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F9-C1", "name": "Hero Banner", "type": "EQ", "complexity": "L", "description": "Homepage promotional banner", "status": "completed" },
+        { "id": "P1-F9-C2", "name": "Deal Cards Display", "type": "EQ", "complexity": "A", "description": "Grid of destination deal cards", "status": "completed" },
+        { "id": "P1-F9-C3", "name": "Flash Sale Banner", "type": "EQ", "complexity": "L", "description": "Limited time offer notification", "status": "completed" },
+        { "id": "P1-F9-C4", "name": "Newsletter Signup", "type": "EI", "complexity": "L", "description": "Email subscription for deals", "status": "completed" },
+        { "id": "P1-F9-C5", "name": "Promotions Data Store", "type": "ILF", "complexity": "A", "description": "Promotional campaigns and codes", "status": "completed" }
+      ]
+    },
+    {
+      "id": "P1-F10",
+      "name": "Supporting Features",
+      "description": "Help, FAQ, notifications, and supporting functionality",
+      "status": "completed",
+      "capabilities": [
+        { "id": "P1-F10-C1", "name": "Help Center", "type": "EQ", "complexity": "A", "description": "FAQ and help articles", "status": "completed" },
+        { "id": "P1-F10-C2", "name": "Contact Support", "type": "EI", "complexity": "A", "description": "Submit support request form", "status": "completed" },
+        { "id": "P1-F10-C3", "name": "User Testimonials", "type": "EQ", "complexity": "L", "description": "Display customer reviews", "status": "completed" },
+        { "id": "P1-F10-C4", "name": "Mobile App Promotion", "type": "EQ", "complexity": "L", "description": "App download banner", "status": "completed" },
+        { "id": "P1-F10-C5", "name": "Cookie Consent", "type": "EI", "complexity": "L", "description": "GDPR cookie consent banner", "status": "completed" }
+      ]
+    }
+  ]
+}
