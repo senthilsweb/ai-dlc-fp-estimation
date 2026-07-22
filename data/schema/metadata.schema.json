@@ -183,7 +183,8 @@
           "description": "Optional. Falls back to 20."
         },
         "levels": {
-          "description": "Optional, informational \u2014 not currently rendered."
+          "type": "object",
+          "description": "Optional. Names for the three hierarchy tiers, e.g. AI-DLC {\"1\":\"Intent\",\"2\":\"Bolt\",\"3\":\"Unit of Work\"} or classic WBS {\"1\":\"Product\",\"2\":\"Feature\",\"3\":\"Capability\"}. Each tier may be a plain string (plural is derived automatically) or {\"singular\":\u2026,\"plural\":\u2026} when the derived plural would be wrong (e.g. \"Unit of Work\" -> \"Units of Work\"). Falls back to classic WBS. Purely presentational: it renames tiers everywhere in the UI and changes no number. A viewer can also override it live from the header Terms selector to re-present the same estimate for a different audience. (Before 2026-07-22 this field was passed through by the server but never read by the app.)"
         },
         "products": {
           "type": "array",
