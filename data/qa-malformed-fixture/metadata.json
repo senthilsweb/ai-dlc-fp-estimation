@@ -1,0 +1,55 @@
+{
+  "$schema": "../schema/metadata.schema.json",
+  "version": "0.0.1",
+  "createdDate": "2026-07-22",
+  "description": "QA fixture: deliberately malformed/empty optional fields (missing/null/empty keyJourneys steps, null gscDefinitions, null sdlcPhases). Not a real project \u2014 used to verify the app degrades gracefully instead of crashing. See docs/adr/0007-json-schema-for-dataset-validation.md.",
+  "projectSummary": {
+    "logo": "mdi:test-tube",
+    "name": "Edge Case Test",
+    "tagline": "Probing null/empty optional fields",
+    "description": "",
+    "techStack": [],
+    "businessContext": {
+      "targetUsers": [],
+      "valuePropositions": []
+    },
+    "keyJourneys": [
+      {
+        "name": "Journey missing steps entirely"
+      },
+      {
+        "name": "Journey with null steps",
+        "steps": null
+      },
+      {
+        "name": "Journey with empty steps",
+        "steps": []
+      }
+    ]
+  },
+  "projectConfig": {
+    "title": "Edge Case",
+    "mainProductName": "Edge Case",
+    "brandPrefix": "EDGE",
+    "organization": "Test",
+    "defaultHourlyRate": 75,
+    "currency": "USD",
+    "hoursPerDay": 8,
+    "daysPerMonth": 20,
+    "products": [
+      {
+        "shortCode": "P1",
+        "description": "Product 1",
+        "dataFile": "p1.json"
+      }
+    ]
+  },
+  "fpConfig": {
+    "fpWeights": {},
+    "gscDefinitions": null
+  },
+  "effortConfig": {
+    "sdlcPhases": null
+  },
+  "statusDefinitions": {}
+}

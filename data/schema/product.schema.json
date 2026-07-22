@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/senthilsweb/ai-dlc-fp-estimation/data/schema/product.schema.json",
+  "title": "FP Estimator product data file",
+  "description": "Schema for each data/<app-name>/<dataFile>.json referenced from metadata.json's projectConfig.products. Documentation/IDE-validation aid only — not enforced at runtime.",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "id": { "type": "string", "description": "Optional. Used as a fallback label if 'shortCode' is absent in metadata.json's product entry." },
+    "name": { "type": "string", "description": "Required — the product's display name." },
+    "status": { "type": "string", "description": "Optional product-level status key (see metadata.json's statusDefinitions). Falls back to 'completed'." },
+    "features": {
+      "type": "array",
+      "description": "Optional. Omit or [] renders the product with 0 features and 0 FP — not an error.",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "capabilities": {
+            "type": "array",
+            "description": "Optional. Omit or [] renders the feature with 0 capabilities and 0 FP.",
+            "items": {
+              "type": "object",
+              "required": ["name", "type", "complexity"],
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string", "description": "FP type key — must match a key under metadata.json's fpConfig.fpWeights (e.g. 'EI', 'EO', 'EQ', 'ILF', 'EIF') or this capability contributes 0 FP silently." },
+                "complexity": { "type": "string", "enum": ["L", "A", "H"], "description": "Low/Average/High — must match a nested key under fpWeights[type] or this capability contributes 0 FP silently." },
+                "status": { "type": "string", "description": "Optional. Falls back to 'completed' for both status-legend filtering and status-count tallies." }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

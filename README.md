@@ -64,11 +64,11 @@ The app layer reads everything it needs — title, branding, status labels, FP w
 
 ## Adding a new dataset
 
-1. Create `data/<your-app-name>/` with a `metadata.json` (see an existing dataset for the schema: `projectConfig`, `fpConfig`, `effortConfig`, `statusDefinitions`, `projectSummary`), a `tech-stack.json`, and one JSON file per product listed in `metadata.json`'s `products` array.
+1. Create `data/<your-app-name>/` with a `metadata.json` (see an existing dataset, and start with `"$schema": "../schema/metadata.schema.json"` for IDE validation/autocomplete against `data/schema/metadata.schema.json` — its field descriptions also document what happens if a field is omitted/null/empty), a `tech-stack.json`, and one JSON file per product listed in `metadata.json`'s `products` array (see `data/schema/product.schema.json`).
 2. Run with `FP_APP=<your-app-name>` (or `--app <your-app-name>`).
 3. No code changes, no rebuild — the Go server merges the files at request time.
 
-See `.claude/skills/add-fp-dataset/SKILL.md` for the step-by-step checklist.
+See `.claude/skills/add-fp-dataset/SKILL.md` for the step-by-step checklist. There's no schema *enforcement* at runtime by design (see [ADR-0007](docs/adr/0007-json-schema-for-dataset-validation.md)) — the app is written to degrade gracefully when optional fields are missing. `data/qa-malformed-fixture/` is a permanent fixture for checking that after touching any renderer: `FP_APP=qa-malformed-fixture ./fp-estimator` should show zero browser console errors.
 
 ## Configuration
 

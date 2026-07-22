@@ -25,6 +25,7 @@ This project is the generic successor to two prior forks that lived in `ctms-gtm
 
 ### Testing Strategy
 - No automated test suite yet. Verify changes by running `go build` and curling `/api/data`, `/api/data?app=<other>`, and `/api/apps` against at least two datasets, plus a manual browser check of the WBS tree, FP totals, and exports.
+- After touching any renderer in `app/index.html`, also run `FP_APP=qa-malformed-fixture` — a permanent fixture with missing/null/empty optional fields throughout — and confirm zero browser console errors. This is what actually caught the `keyJourneys`/`gscDefinitions` bugs fixed under `harden-dataset-rendering`; code review alone did not.
 
 ### Git Workflow
 - `main` is the working branch. Conventional, verb-led commit messages (`feat:`, `fix:`, `refactor:`).

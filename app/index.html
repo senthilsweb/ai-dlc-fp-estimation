@@ -866,19 +866,29 @@
             // Initialize inclusion state for all products and features
             initializeInclusionState();
 
-            // Render project summary first
-            renderProjectSummary();
-
-            renderStats();
-            renderWBSTree();
-            renderFPTypes();
-            renderProductivityFactors();
-            renderTechFactors();
-            renderTechStack();
-            renderGlossary();
-            initializeGSC();
+            // Each section renders independently — a malformed or missing field
+            // in one part of the dataset (e.g. a keyJourney with no steps) logs
+            // an error and leaves that section's slot empty, rather than
+            // aborting every other section too.
+            safeRender('project summary', renderProjectSummary);
+            safeRender('stats', renderStats);
+            safeRender('WBS tree', renderWBSTree);
+            safeRender('FP types', renderFPTypes);
+            safeRender('productivity factors', renderProductivityFactors);
+            safeRender('tech factors', renderTechFactors);
+            safeRender('tech stack', renderTechStack);
+            safeRender('glossary', renderGlossary);
+            safeRender('GSC factors', initializeGSC);
             updateToggleButton();
             syncStatusFilterCheckboxes();
+        }
+
+        function safeRender(label, fn) {
+            try {
+                fn();
+            } catch (error) {
+                console.error(`Failed to render ${label} — check the active dataset's metadata.json for a malformed or missing field:`, error);
+            }
         }
 
         // Status legend labels come from the dataset's statusDefinitions (metadata.json),
@@ -1006,7 +1016,7 @@
                     </div>
                     <div class="p-5">
                         <p class="text-gray-600 mb-4">${summary.description || 'No description available.'}</p>
-                        ${summary.techStack ? `
+                        ${summary.techStack && summary.techStack.length > 0 ? `
                         <div class="mb-4">
                             <div class="text-sm font-medium text-gray-500 mb-2">Technology Stack</div>
                             <div class="flex flex-wrap gap-2">
@@ -1034,7 +1044,7 @@
                         </h3>
                     </div>
                     <div class="p-5">
-                        ${summary.businessContext?.targetUsers ? `
+                        ${summary.businessContext?.targetUsers && summary.businessContext.targetUsers.length > 0 ? `
                         <div class="mb-4">
                             <div class="text-sm font-medium text-gray-500 mb-2">Target Users</div>
                             <ul class="space-y-1">
@@ -1047,7 +1057,7 @@
                             </ul>
                         </div>
                         ` : ''}
-                        ${summary.businessContext?.valuePropositions ? `
+                        ${summary.businessContext?.valuePropositions && summary.businessContext.valuePropositions.length > 0 ? `
                         <div>
                             <div class="text-sm font-medium text-gray-500 mb-2">Value Propositions</div>
                             <ul class="space-y-1">
@@ -1077,20 +1087,24 @@
                             </h3>
                         </div>
                         <div class="p-5 space-y-4">
-                            ${summary.keyJourneys.map(journey => `
+                            ${summary.keyJourneys.map(journey => {
+                                const steps = journey.steps || [];
+                                return `
                                 <div class="bg-gray-50 rounded-lg p-4">
                                     <div class="flex items-center gap-2 mb-3">
                                         <iconify-icon icon="${journey.icon || 'mdi:walk'}" class="text-xl text-purple-600"></iconify-icon>
-                                        <span class="font-medium text-gray-800">${journey.name}</span>
+                                        <span class="font-medium text-gray-800">${journey.name || 'Untitled journey'}</span>
                                     </div>
+                                    ${steps.length > 0 ? `
                                     <div class="flex flex-wrap items-center gap-2">
-                                        ${journey.steps.map((step, idx) => `
+                                        ${steps.map((step, idx) => `
                                             <span class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 shadow-sm">${step}</span>
-                                            ${idx < journey.steps.length - 1 ? '<iconify-icon icon="mdi:arrow-right" class="text-gray-400"></iconify-icon>' : ''}
+                                            ${idx < steps.length - 1 ? '<iconify-icon icon="mdi:arrow-right" class="text-gray-400"></iconify-icon>' : ''}
                                         `).join('')}
                                     </div>
+                                    ` : '<p class="text-sm text-gray-400 italic">No steps defined for this journey.</p>'}
                                 </div>
-                            `).join('')}
+                            `; }).join('')}
                         </div>
                     </div>
                 `;
@@ -1406,8 +1420,11 @@
             }
         }
 
-        // GSC (General System Characteristics) definitions with dataset-provided defaults
-        const gscDefinitions = [
+        // Standard IFPUG GSC (General System Characteristics) definitions — used only
+        // as a fallback. A dataset's own fpConfig.gscDefinitions (if present and
+        // non-empty) takes precedence; see initializeGSC(), which sets the real
+        // `gscDefinitions` binding once wbsData has loaded.
+        const defaultGscDefinitions = [
             { id: 1, name: "Data Communications", description: "Degree to which the application communicates with a processor other than its main processor. Includes APIs, web services, network protocols.", default: 4 },
             { id: 2, name: "Distributed Data Processing", description: "Degree to which data is transferred between components. Includes microservices, message queues, distributed databases.", default: 3 },
             { id: 3, name: "Performance", description: "User-stated response time or throughput objectives. Critical for real-time applications or high-volume systems.", default: 3 },
@@ -1423,10 +1440,17 @@
             { id: 13, name: "Multiple Sites", description: "Application designed for multiple organizations or sites. Multi-tenancy, localization, configuration.", default: 4 },
             { id: 14, name: "Facilitate Change", description: "Application designed to facilitate change. Flexibility, parameterization, configurability.", default: 4 }
         ];
+        let gscDefinitions = defaultGscDefinitions;
 
         let gscValues = {};
 
         function initializeGSC() {
+            // Prefer the dataset's own fpConfig.gscDefinitions; fall back to the
+            // standard IFPUG 14 only if the dataset omits or empties it.
+            gscDefinitions = (wbsData.gscDefinitions && wbsData.gscDefinitions.length > 0)
+                ? wbsData.gscDefinitions
+                : defaultGscDefinitions;
+
             // Load from localStorage or use defaults
             const stored = localStorage.getItem(nsKey('gsc-values'));
             if (stored) {

@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/senthilsweb/ai-dlc-fp-estimation/data/schema/metadata.schema.json",
+  "title": "FP Estimator dataset metadata.json",
+  "description": "Schema for data/<app-name>/metadata.json. This documents the shape server/handler/data.go and app/index.html actually consume, including which fields are truly required vs which have a safe fallback when omitted, null, or empty. It is a documentation/IDE-validation aid (reference it via a \"$schema\" key in your metadata.json for editor autocomplete/validation) — it is NOT enforced at runtime; the server and app are deliberately tolerant of missing optional fields (see docs/adr/0007-json-schema-for-dataset-validation.md).",
+  "type": "object",
+  "required": ["projectConfig"],
+  "properties": {
+    "$schema": { "type": "string", "description": "Point this at ../schema/metadata.schema.json (relative to your data/<app-name>/ folder) for IDE validation." },
+    "version": { "type": "string", "description": "Optional. Shown in the footer as 'vX.Y.Z'; falls back to '1.0.0' if omitted." },
+    "createdDate": { "type": "string", "description": "Optional, informational only." },
+    "lastUpdated": { "type": "string", "description": "Optional, informational only — not currently rendered." },
+    "description": { "type": "string", "description": "Optional. Not rendered directly; projectSummary.description is what's shown on the Project tab." },
+
+    "projectSummary": {
+      "type": "object",
+      "description": "Optional. Omit entirely to show a generic empty-state on the Project tab instead of the hero/overview cards.",
+      "properties": {
+        "logo": { "type": "string", "description": "Optional Iconify icon name (e.g. 'mdi:rocket-launch'). Falls back to a generic rocket icon." },
+        "logoColor": { "type": "string", "description": "Optional CSS color for the logo icon. Falls back to white." },
+        "name": { "type": "string", "description": "Optional. Falls back to metadata.brandPrefix, then 'Project'." },
+        "tagline": { "type": "string", "description": "Optional. Falls back to an empty string (hero renders with no subtitle)." },
+        "description": { "type": "string", "description": "Optional. Falls back to 'No description available.'" },
+        "techStack": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional. Omit, null, or [] all correctly hide the Technology Stack block (no empty header shown)."
+        },
+        "businessContext": {
+          "type": "object",
+          "description": "Optional in full.",
+          "properties": {
+            "industry": { "type": "string", "description": "Optional. Industry line is hidden entirely if omitted." },
+            "targetUsers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Optional. Omit, null, or [] correctly hide the Target Users block."
+            },
+            "valuePropositions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Optional. Omit, null, or [] correctly hide the Value Propositions block."
+            }
+          }
+        },
+        "links": {
+          "type": "object",
+          "description": "Optional. Only recognized keys render a button; unknown keys are ignored.",
+          "properties": {
+            "liveDemo": { "type": "string", "format": "uri" },
+            "figma": { "type": "string", "format": "uri" },
+            "github": { "type": "string", "format": "uri" },
+            "documentation": { "type": "string", "format": "uri" },
+            "website": { "type": "string", "format": "uri" }
+          }
+        },
+        "keyJourneys": {
+          "type": "array",
+          "description": "Optional. Omit, null, or [] correctly hide the 'Core User Journeys' card entirely. Each entry's own 'steps' is independently optional — a journey with no steps renders 'No steps defined for this journey.' instead of breaking the page.",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "description": "Required per-journey (falls back to 'Untitled journey' if somehow absent)." },
+              "icon": { "type": "string", "description": "Optional Iconify icon name. Falls back to 'mdi:walk'." },
+              "steps": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Optional. Omit, null, or [] renders a 'No steps defined' placeholder for that one journey card — it no longer crashes the whole app (fixed 2026-07-22; previously an absent/null 'steps' threw and blanked every section, not just this card)."
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "projectConfig": {
+      "type": "object",
+      "description": "Required. This is the one object the server treats as authoritative for branding/FP defaults/product list.",
+      "required": ["products"],
+      "properties": {
+        "title": { "type": "string", "description": "Optional, informational (not directly rendered)." },
+        "mainProductName": { "type": "string", "description": "Optional, informational (not directly rendered)." },
+        "brandPrefix": { "type": "string", "description": "Optional but strongly recommended — drives the page title, footer text, and Excel/PDF export filename prefix. Falls back to 'FP'." },
+        "organization": { "type": "string", "description": "Optional, informational only." },
+        "defaultHourlyRate": { "type": "number", "description": "Optional. Falls back to 75." },
+        "currency": { "type": "string", "description": "Optional. Falls back to 'USD'. Not currently rendered as a symbol — informational." },
+        "hoursPerDay": { "type": "number", "description": "Optional. Falls back to 8." },
+        "daysPerMonth": { "type": "number", "description": "Optional. Falls back to 20." },
+        "levels": { "description": "Optional, informational — not currently rendered." },
+        "products": {
+          "type": "array",
+          "description": "Required, and must be non-empty for a meaningful dataset (an empty list renders 'No products defined').",
+          "items": {
+            "type": "object",
+            "required": ["dataFile"],
+            "properties": {
+              "shortCode": { "type": "string", "description": "Optional. Shown under the product name on the Project tab; falls back to the product JSON's own 'id' field, then nothing." },
+              "description": { "type": "string", "description": "Optional. Not currently surfaced separately from the product JSON's own content." },
+              "dataFile": { "type": "string", "description": "Required — filename (relative to this dataset's folder) of the product JSON to merge in. A missing/unreadable file is silently skipped (matches the prior combine-wbs.js behavior) — the product just won't appear, with no error surfaced to the UI. Double-check this if a product goes missing." }
+            }
+          }
+        }
+      }
+    },
+
+    "fpConfig": {
+      "type": "object",
+      "description": "Optional in full — omit and the server defaults every field below.",
+      "properties": {
+        "fpWeights": { "type": "object", "description": "Optional. Falls back to {} (all capabilities compute 0 FP if this is empty — the totals will just be 0, not an error)." },
+        "complexityGuidelines": { "type": "object", "description": "Optional, informational — shown on the FP Guide tab." },
+        "gscDefinitions": {
+          "type": "array",
+          "description": "Optional. If omitted, null, or [], the app falls back to the standard IFPUG 14-factor list (fixed 2026-07-22 — previously this dataset field was defined but silently ignored; the app always used its own hardcoded 14, discarding any dataset-authored defaults).",
+          "items": {
+            "type": "object",
+            "required": ["id", "name"],
+            "properties": {
+              "id": { "type": "integer" },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "default": { "type": "integer", "minimum": 0, "maximum": 5, "description": "Optional GSC default rating (0-5). Falls back to 0 if absent." }
+            }
+          }
+        },
+        "gscRatingGuide": { "type": "object", "description": "Optional, informational." }
+      }
+    },
+
+    "effortConfig": {
+      "type": "object",
+      "description": "Optional in full.",
+      "properties": {
+        "techStackFactors": { "type": "object", "description": "Optional, informational — shown on the Tech Stack tab." },
+        "productivityFactors": { "type": "object", "description": "Optional, informational." },
+        "sdlcPhases": {
+          "type": "array",
+          "description": "Optional. If omitted or null, the app falls back to its own built-in SDLC phase breakdown (a hardcoded default list in app/index.html) rather than erroring.",
+          "items": {
+            "type": "object",
+            "required": ["percentage"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "percentage": { "type": "number" },
+              "icon": { "type": "string" },
+              "color": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "statusDefinitions": {
+      "type": "object",
+      "description": "Optional. Keys are status ids used on capabilities (e.g. 'completed', 'partial', 'in-progress', 'roadmap', 'beta'). If omitted entirely, the status legend falls back to generic English labels ('Completed', 'Partial', etc.) for every key.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string", "description": "Drives the status-legend filter text. This is the field that lets a dataset relabel e.g. 'roadmap' as 'Build New'." },
+          "description": { "type": "string" },
+          "icon": { "type": "string" }
+        }
+      }
+    },
+
+    "glossary": {
+      "description": "Optional — array or object, rendered as-is on the Glossary tab. Omit to show that tab empty.",
+      "type": ["array", "object", "null"]
+    }
+  }
+}

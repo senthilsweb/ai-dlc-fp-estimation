@@ -11,12 +11,12 @@ This repo serves one generic app layer (`app/index.html`) against whichever data
 
 1. **Create the folder**: `data/<app-name>/` (kebab-case, becomes the value of `FP_APP` and the `appId` in `/api/data`).
 
-2. **Write `metadata.json`**. Model it on an existing dataset (`data/ai-agents-provly/metadata.json` or `data/tripma/metadata.json`). Required shape:
+2. **Write `metadata.json`**. Model it on an existing dataset (`data/ai-agents-provly/metadata.json` or `data/tripma/metadata.json`), and add `"$schema": "../schema/metadata.schema.json"` as the first key — most editors (VS Code included) will then validate and autocomplete against `data/schema/metadata.schema.json` as you type. That schema's per-field `description`s also document exactly what happens when a field is omitted/null/empty (most optional fields degrade gracefully — see ADR-0007 — but it's worth reading rather than assuming). Required shape:
    - `projectConfig`: `title`, `mainProductName`, `brandPrefix`, `organization`, `defaultHourlyRate`, `currency`, `hoursPerDay`, `daysPerMonth`, `levels`, and `products` — an array of `{ shortCode, description, dataFile }` entries, one per product file you'll create in step 4.
-   - `fpConfig`: `fpWeights`, `complexityGuidelines`, `gscDefinitions`, `gscRatingGuide`.
+   - `fpConfig`: `fpWeights`, `complexityGuidelines`, `gscDefinitions`, `gscRatingGuide`. `gscDefinitions` is optional (falls back to the standard IFPUG 14) but if you provide it, your `default` ratings are what the GSC sliders actually initialize to — this wasn't true before 2026-07-22 (ADR-0007 fixed a bug where this field was silently ignored).
    - `effortConfig`: `techStackFactors`, `productivityFactors`, `sdlcPhases`.
    - `statusDefinitions`: label/description per status key (`completed`, `partial`, `in-progress`, `roadmap`, `beta`, ...) — this is what drives the status-legend text in the UI, so relabel here rather than touching HTML.
-   - `projectSummary` (optional but recommended): powers the Project Summary tab — `name`, `tagline`, `description`, `techStack`, `businessContext`, `keyJourneys`.
+   - `projectSummary` (optional but recommended): powers the Project Summary tab — `name`, `tagline`, `description`, `techStack`, `businessContext`, `keyJourneys`. Every array field here (`techStack`, `businessContext.targetUsers`/`.valuePropositions`, `keyJourneys`, and each journey's own `steps`) can be omitted, null, or empty without breaking the page — each just hides or placeholders that one piece.
    - `glossary` (optional).
 
 3. **Write `tech-stack.json`** (optional): `{ "products": [...], "summary": {...} }` for the Tech Stack tab.
@@ -32,3 +32,8 @@ This repo serves one generic app layer (`app/index.html`) against whichever data
 - Forgetting a `dataFile` referenced in `metadata.json` — the server silently skips missing product files (same behavior as the old `combine-wbs.js`), so a product silently vanishing from the UI usually means a typo'd filename.
 - Reusing another dataset's `appId`/folder name — this becomes the `localStorage` namespace, so a collision would mix two datasets' saved inclusion state in the same browser profile.
 - Adding project-specific copy to `app/index.html` instead of `projectSummary`/`statusDefinitions` in `metadata.json`. If it's about one project, it belongs in the dataset.
+- A capability's `type`/`complexity` not matching a key under `fpConfig.fpWeights` — it silently contributes 0 FP rather than erroring, so an unexpectedly low total usually means a typo there, not a missing capability.
+
+## Verifying a new dataset doesn't break rendering
+
+After adding a dataset, run it once with `--dev` (see the README) and check the browser console for `Failed to render <section>` messages — that's `safeRender()` telling you exactly which section choked on which field, without taking the rest of the page down. `data/qa-malformed-fixture/` is a permanent fixture exercising the worst case (missing/null/empty optional fields everywhere) — point `FP_APP` at it as a smoke test after touching any renderer in `app/index.html`.
