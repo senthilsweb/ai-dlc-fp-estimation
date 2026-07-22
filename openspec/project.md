@@ -4,6 +4,10 @@
 
 A standalone, single-Go-binary Function Point (IFPUG) / WBS estimator. One generic app layer serves any number of project datasets, each partitioned under `data/<app-name>/` and selected at runtime via config — no rebuild, no per-project fork of the app code.
 
+**Direction (from 2026-07-22):** the tool is being adapted for **AI-DLC** — estimating greenfield projects and proposals where an agent does ~90% of the work and the human steers, reviews, and approves. The gap being filled is that no calibrated estimation model exists for agent-led delivery. The approach is deliberately conservative: **Function Points stay the invariant measure** (a function's size doesn't change because an agent wrote it), while everything methodology-dependent becomes a configurable weight — chiefly PDR, hours per FP, which swings from ~8h (human-driven Java) to ~15min (AI-DLC simple task). AI-DLC vocabulary (Intent → Bolt → Unit of Work) is a **presentation layer**; under the hood it remains FP.
+
+Read [`docs/ai-dlc-estimation-model.md`](../docs/ai-dlc-estimation-model.md) before proposing any change to the estimation core — it records the reasoning, the open calibration problem, and what is deliberately *not* being changed. [ADR-0008](../docs/adr/0008-fp-as-invariant-ai-dlc-as-presentation.md) is the decision record.
+
 This project is the generic successor to two prior forks that lived in `ctms-gtm-mono-repo`: `ctms-business-features-fp` (CTMS) and `ai-agents-provly/business-features-fp` (Provly). Those forks duplicated the entire app layer per project and diverged only in `data/`; this repo collapses that back into one engine plus N datasets.
 
 ## Tech Stack

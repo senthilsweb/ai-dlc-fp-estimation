@@ -62,6 +62,9 @@ Request flow: `main.go` embeds `app/` and `data/` via `//go:embed`, reads `FP_AP
 - **No access control in this repo at this stage.** Don't add auth, roles, or per-viewer gating unless explicitly asked — this was a deliberate simplification from the multi-tenant portal this project was extracted from.
 - **No Node/build step.** The old `combine-wbs.js` script that merged `data/*.json` into `wbs-data.json` was ported into `server/handler/data.go` — the Go binary does the merge at request time. Don't reintroduce a JS build step for this.
 - **localStorage keys must stay namespaced.** The app derives a per-dataset key prefix from `wbsData.appId` (see `nsKey()` in `app/index.html`) so two datasets loaded in the same browser don't clobber each other's saved inclusion/GSC state. Never hardcode a bare localStorage key.
+- **Function Points are the invariant; AI-DLC is presentation plus weights.** Don't replace FP with an alternative sizing unit (eval counts, story points, t-shirt sizes) — a function's size doesn't change because an agent wrote it, and that invariance is what makes agent-led vs human-led delivery comparable at all. Methodology-dependent things are configurable data: PDR (`projectConfig.defaultPDR`), productivity factors, level vocabulary (`projectConfig.levels`), status lifecycle (`statusDefinitions`). See `docs/ai-dlc-estimation-model.md` and ADR-0008 before touching the estimation core.
+- **Never infer complexity from child counts.** A bolt with many simple tasks can be faster than one with few complex tasks. Complexity is an assigned rating on the work, not a function of how many children it has.
+- **Evals are units of work, not a separate effort model.** Eval design, dataset prep and rubric prep are tasks inside a bolt, sized like any other task. Don't add a parallel additive-effort path or phase-weight redistribution for verification.
 
 ## Adding a dataset
 

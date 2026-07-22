@@ -86,6 +86,14 @@ See `.claude/skills/add-fp-dataset/SKILL.md` for the step-by-step checklist. The
 
 This project follows the OpenSpec workflow — see `openspec/AGENTS.md` for the process and `openspec/project.md` for conventions. Active proposals live in `openspec/changes/`; built capabilities are recorded in `openspec/specs/`.
 
+## Where this is heading: AI-DLC
+
+The tool is being adapted to estimate **AI-DLC** delivery — greenfield projects and proposals where an agent does ~90% of the work and the human steers, reviews and approves. No calibrated estimation model exists for that mode of working; this is an attempt at a defensible starting point.
+
+The core bet is conservative: **Function Points stay the invariant** — a function's functional size doesn't change because an agent wrote it rather than a human — while everything methodology-dependent becomes a configurable weight. The main dial is PDR (hours per Function Point), which swings from roughly **8 hours** for human-driven Java work to roughly **15 minutes** for a simple task under AI-DLC. AI-DLC vocabulary (Intent → Bolt → Unit of Work) is presentation only; underneath it stays FP.
+
+Read [`docs/ai-dlc-estimation-model.md`](docs/ai-dlc-estimation-model.md) for the full model, the intended workflow, and the calibration plan — and note that its numbers are **hypotheses to be calibrated, not measurements**. The decision itself is [ADR-0008](docs/adr/0008-fp-as-invariant-ai-dlc-as-presentation.md).
+
 ## Architecture Decision Records
 
 The *why* behind this repo's structure is recorded in `docs/adr/` — see [`docs/adr/README.md`](docs/adr/README.md) for the index. Start with [ADR-0002](docs/adr/0002-separate-generic-app-layer-from-per-project-data.md) (app/data split) and [ADR-0004](docs/adr/0004-defer-access-control.md) (why there's no auth) if you're new here.

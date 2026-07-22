@@ -13,6 +13,9 @@ This directory records the architecturally significant decisions for this repo, 
 | [0005](0005-namespace-client-state-by-active-dataset.md) | Namespace client-side state by the active dataset | Accepted |
 | [0006](0006-dev-mode-serves-live-filesystem.md) | Dev mode serves app/ and data/ live from disk | Accepted |
 | [0007](0007-json-schema-for-dataset-validation.md) | JSON Schema for dataset docs, defensive JS as the runtime safety net | Accepted |
+| [0008](0008-fp-as-invariant-ai-dlc-as-presentation.md) | FP stays the invariant; AI-DLC is presentation plus configurable weights | Accepted |
+
+For the estimation model itself — the reasoning, the PDR dial, and the calibration plan — see [`../ai-dlc-estimation-model.md`](../ai-dlc-estimation-model.md).
 
 ## When to add a new ADR
 
